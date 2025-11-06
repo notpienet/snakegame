@@ -31,7 +31,7 @@ function init() {
             const grid = document.createElement("div");
             grid.setAttribute("class", "grid");
             grid.setAttribute("id", i.toString() + "_" + j.toString());
-            let b = (1 - Math.abs(n / 2 - i) / n) * (1 - Math.abs(m / 2 - j) / n) * 1.5;
+            let b = (1 - Math.abs(n / 2 - i) / n) * (1 - Math.abs(m / 2 - j) / n) * 1;
             if((i + j) % 2 == 0) grid.style.backgroundColor = "rgb(" + g1 * b + ", " + g1 * b + ", " + g1 * b + ")";
             else grid.style.backgroundColor = "rgb(" + g2 * b + ", " + g2 * b + ", " + g2 * b + ")";
             const img = document.createElement("img");
