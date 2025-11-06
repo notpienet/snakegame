@@ -11,6 +11,17 @@ let cur = 5, spawn = 3;
 let orb = [];
 let open = [0];
 
+function reset() {
+    clearInterval(interval);
+    n = 17, m = 17;
+    pos = [[Math.ceil(n / 2), Math.ceil(m / 2) - 2]];
+    x = pos[0][0], y = pos[0][1];
+    dir = 2, last = 2;
+    cur = 5, spawn = 3;
+    orb = [];
+    interval = setInterval(update, cd);
+}
+
 function init() {
     for(i = 1; i <= n; i++) {
         const row = document.createElement("div");
@@ -42,8 +53,10 @@ function spawnOrb() {
             if(open[i][j] == 0) cand.push([i, j]);
         }
     }
+    if(cand.length == 0) return false;
     orb.push(cand[Math.floor(Math.random() * (cand.length))]);
     open[orb[orb.length - 1][0]][orb[orb.length - 1][1]] = 1;
+    return true;
 }
 
 function die() {
@@ -60,19 +73,6 @@ function move() {
     if(dir == 4) pos.push([x, y - 1]);
     x = pos[pos.length - 1][0];
     y = pos[pos.length - 1][1];
-    if(x < 1 || x > n || y < 1 || y > m) {
-        die();
-        return false;
-    }
-    else {
-        for(let i = 0; i + 1 < pos.length; i++) {
-            if(pos[i][0] == x && pos[i][1] == y) {
-                die();
-                return false;
-            }
-        }
-    }
-    return true;
 }
 
 function resetGrid() {
@@ -94,26 +94,30 @@ function checkOpen() {
     }
 }
 
-function updOrb() {
+function checkOrb() {
+    while(orb.length < spawn && spawnOrb()) {}
     const neworb = [];
-    while(orb.length < spawn) spawnOrb();
     for(let i = 0; i < orb.length; i++) {
         if(orb[i][0] == x && orb[i][1] == y) {
             cur++;
             spawnOrb();
             continue;
         }
-        const img = document.getElementById(orb[i][0].toString() + "." + orb[i][1].toString());
-        img.src = orb_sprite;
-        img.style.filter = "brightness(1)";
         neworb.push([orb[i][0], orb[i][1]]);
     }
     orb = neworb;
 }
 
+function drawOrb() {
+    for(let i = 0; i < orb.length; i++) {
+        const img = document.getElementById(orb[i][0].toString() + "." + orb[i][1].toString());
+        img.src = orb_sprite;
+        img.style.filter = "brightness(1)";
+    }
+}
+
 function drawSnake() {
     let a = 0, b = 0;
-    if(pos.length > cur) pos.shift();
     for(let i = 0; i + 1 < pos.length; i++) {
         if(pos[i + 1][0] == pos[i][0] + 1) b = 3;
         if(pos[i + 1][0] == pos[i][0] - 1) b = 1;
@@ -135,32 +139,40 @@ function drawSnake() {
     }
 }
 
-function reset() {
-    clearInterval(interval);
-    interval = setInterval(update, cd);
-    n = 17, m = 17;
-    pos = [[Math.ceil(n / 2), Math.ceil(m / 2) - 2]];
-    x = pos[0][0], y = pos[0][1];
-    dir = 2, last = 2;
-    cur = 5, spawn = 3;
-    orb = [];
+function checkHit() {
+    if(pos.length > cur) pos.shift();
+    if(x < 1 || x > n || y < 1 || y > m) {
+        die();
+        return false;
+    }
+    else {
+        for(let i = 0; i + 1 < pos.length; i++) {
+            if(pos[i][0] == x && pos[i][1] == y) {
+                die();
+                return false;
+            }
+        }
+    }
+    return true;
 }
 
 function update() {
-    if(!move()) return;
-    resetGrid();
+    move()
     checkOpen();
-    updOrb();
+    checkOrb();
+    if(!checkHit()) return;
+    resetGrid();
+    drawOrb();
     drawSnake();
 }
 
 document.addEventListener('keydown', function(event) {
     let press = event.key.toLowerCase();
     let cand = -1;
-    if(press == "w") cand = 1;
-    if(press == "d") cand = 2;
-    if(press == "s") cand = 3;
-    if(press == "a") cand = 4;
+    if(press == "w" || press == "arrowup") cand = 1;
+    if(press == "d" || press == "arrowright") cand = 2;
+    if(press == "s" || press == "arrowdown") cand = 3;
+    if(press == "a" || press == "arrowleft") cand = 4;
     if(press == " ") reset();
     if(cand != (last + 1) % 4 + 1 && cand != -1 && cand != dir) dir = cand;
 });
