@@ -65,7 +65,6 @@ function spawnOrb() {
 
 function die() {
     clearInterval(interval);
-    playing = 0;
 }
 
 function move() {
