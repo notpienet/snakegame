@@ -1,44 +1,56 @@
+const cd = 100;
+const orb_sprite = "assets/orb.png";
+const empty_sprite = "assets/-.png";
 const game = document.getElementById("game");
+const g1 = 95, g2 = 58;
 let n = 17, m = 17;
-let g1 = "gray", g2 = "lightgray";
-const pos = [[Math.ceil(n / 2), Math.ceil(m / 2) - 2]];
+let pos = [[Math.ceil(n / 2), Math.ceil(m / 2) - 2]];
 let x = pos[0][0], y = pos[0][1];
 let dir = 2, last = 2;
-let cur = 5, spawn = 1;
-let apple = [];
-const open = [0];
-for(let i = 1; i <= n; i++) {
-    const row = document.createElement("div");
-    row.setAttribute("class", "row");
-    const temp = [0];
-    for(let j = 1; j <= m; j++) {
-        const grid = document.createElement("div");
-        grid.setAttribute("class", "grid");
-        grid.setAttribute("id", i.toString() + "_" + j.toString());
-        if((i + j) % 2 == 0) grid.style.backgroundColor = g1;
-        else grid.style.backgroundColor = g2;
-        const img = document.createElement("img");
-        img.setAttribute("class", "gimg");
-        img.setAttribute("id", i.toString() + "." + j.toString());
-        grid.append(img);
-        row.append(grid);
-        temp.push(0);
+let cur = 5, spawn = 3;
+let orb = [];
+let open = [0];
+
+function init() {
+    for(i = 1; i <= n; i++) {
+        const row = document.createElement("div");
+        row.setAttribute("class", "row");
+        const temp = [0];
+        for(let j = 1; j <= m; j++) {
+            const grid = document.createElement("div");
+            grid.setAttribute("class", "grid");
+            grid.setAttribute("id", i.toString() + "_" + j.toString());
+            let b = (1 - Math.abs(n / 2 - i) / n) * (1 - Math.abs(m / 2 - j) / n) * 1.5;
+            if((i + j) % 2 == 0) grid.style.backgroundColor = "rgb(" + g1 * b + ", " + g1 * b + ", " + g1 * b + ")";
+            else grid.style.backgroundColor = "rgb(" + g2 * b + ", " + g2 * b + ", " + g2 * b + ")";
+            const img = document.createElement("img");
+            img.setAttribute("class", "gimg");
+            img.setAttribute("id", i.toString() + "." + j.toString());
+            grid.append(img);
+            row.append(grid);
+            temp.push(0);
+        }
+        open.push(temp);
+        game.append(row);
     }
-    open.push(temp);
-    game.append(row);
 }
 
-function spawnapple() {
+function spawnOrb() {
     const cand = [];
     for(let i = 1; i <= n; i++) {
         for(let j = 1; j <= m; j++) {
             if(open[i][j] == 0) cand.push([i, j]);
         }
     }
-    apple.push(cand[Math.floor(Math.random() * (cand.length))]);
+    orb.push(cand[Math.floor(Math.random() * (cand.length))]);
+    open[orb[orb.length - 1][0]][orb[orb.length - 1][1]] = 1;
 }
 
-function update() {
+function die() {
+    clearInterval(interval);
+}
+
+function move() {
     x = pos[pos.length - 1][0];
     y = pos[pos.length - 1][1];
     last = dir;
@@ -48,28 +60,59 @@ function update() {
     if(dir == 4) pos.push([x, y - 1]);
     x = pos[pos.length - 1][0];
     y = pos[pos.length - 1][1];
+    if(x < 1 || x > n || y < 1 || y > m) {
+        die();
+        return false;
+    }
+    else {
+        for(let i = 0; i + 1 < pos.length; i++) {
+            if(pos[i][0] == x && pos[i][1] == y) {
+                die();
+                return false;
+            }
+        }
+    }
+    return true;
+}
+
+function resetGrid() {
     for(let i = 1; i <= n; i++) {
         for(let j = 1; j <= m; j++) {
             const img = document.getElementById(i.toString() + "." + j.toString());
-            img.src = "assets/-.png";
+            img.src = empty_sprite;
             open[i][j] = 0;
         }
     }
-    console.log(x, y);
-    let a = 0, b = 0;
-    const newapple = [];
-    for(let i = 0; i < apple.length; i++) {
-        if(apple[i][0] == x && apple[i][1] == y) {
+}
+
+function checkOpen() {
+    for(let i = 0; i + 1 < pos.length; i++) {
+        if(pos[i][0] >= 1 && pos[i][0] <= n && pos[i][1] >= 1 && pos[i][1] <= m) open[pos[i][0]][pos[i][1]] = 1;
+    }
+    for(let i = 0; i < orb.length; i++) {
+        open[orb[i][0]][orb[i][1]] = 1;
+    }
+}
+
+function updOrb() {
+    const neworb = [];
+    while(orb.length < spawn) spawnOrb();
+    for(let i = 0; i < orb.length; i++) {
+        if(orb[i][0] == x && orb[i][1] == y) {
             cur++;
-            spawnapple();
+            spawnOrb();
             continue;
         }
-        const img = document.getElementById(apple[i][0].toString() + "." + apple[i][1].toString());
-        img.src = "assets/apple.png";
+        const img = document.getElementById(orb[i][0].toString() + "." + orb[i][1].toString());
+        img.src = orb_sprite;
         img.style.filter = "brightness(1)";
-        newapple.push([apple[i][0], apple[i][1]]);
+        neworb.push([orb[i][0], orb[i][1]]);
     }
-    apple = newapple;
+    orb = neworb;
+}
+
+function drawSnake() {
+    let a = 0, b = 0;
     if(pos.length > cur) pos.shift();
     for(let i = 0; i + 1 < pos.length; i++) {
         if(pos[i + 1][0] == pos[i][0] + 1) b = 3;
@@ -81,7 +124,7 @@ function update() {
             const img = document.getElementById(pos[i][0].toString() + "." + pos[i][1].toString());
             img.src = "assets/" + Math.min(a, b).toString() + Math.max(a, b).toString() + ".png";
             const fade = Math.min(1, pos.length * 0.1) * i / (pos.length - 1);
-            img.style.filter = "brightness(" + (Math.min(2, 1 + pos.length * 0.1) - fade).toString() + ")";
+            img.style.filter = "brightness(" + (Math.max(0.5, 1 - pos.length * 0.05) + fade * 0.5).toString() + ")";
         }
         a = ((b + 1) % 4 + 1);
     }
@@ -90,7 +133,25 @@ function update() {
         temp.src = "assets/0" + a.toString() + ".png";
         temp.style.filter = "brightness(1)";
     }
-    while(apple.length < spawn) spawnapple();
+}
+
+function reset() {
+    clearInterval(interval);
+    interval = setInterval(update, cd);
+    n = 17, m = 17;
+    pos = [[Math.ceil(n / 2), Math.ceil(m / 2) - 2]];
+    x = pos[0][0], y = pos[0][1];
+    dir = 2, last = 2;
+    cur = 5, spawn = 3;
+    orb = [];
+}
+
+function update() {
+    if(!move()) return;
+    resetGrid();
+    checkOpen();
+    updOrb();
+    drawSnake();
 }
 
 document.addEventListener('keydown', function(event) {
@@ -100,10 +161,9 @@ document.addEventListener('keydown', function(event) {
     if(press == "d") cand = 2;
     if(press == "s") cand = 3;
     if(press == "a") cand = 4;
-    if(cand != (last + 1) % 4 + 1 && cand != -1 && cand != dir) {
-        dir = cand;
-        console.log(dir);
-    }
+    if(press == " ") reset();
+    if(cand != (last + 1) % 4 + 1 && cand != -1 && cand != dir) dir = cand;
 });
 
-let interval = setInterval(update, 100);
+init();
+let interval = setInterval(update, cd);
