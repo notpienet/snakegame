@@ -6,6 +6,10 @@
     background-position: center;
 }
 
+.gimg {
+    width: 100%;
+}
+
 .row {
     display: flex;
 }
