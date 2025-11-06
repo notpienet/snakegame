@@ -4,22 +4,26 @@ const empty_sprite = "assets/-.png";
 const game = document.getElementById("game");
 const g1 = 95, g2 = 58;
 let n = 17, m = 17;
-let pos = [[Math.ceil(n / 2), Math.ceil(m / 2) - 2]];
+let pos = [[Math.ceil(n / 2), Math.ceil(m / 2) - 6]];
 let x = pos[0][0], y = pos[0][1];
 let dir = 2, last = 2;
 let cur = 5, spawn = 3;
 let orb = [];
 let open = [0];
+let playing = 0;
+let interval;
 
 function reset() {
     clearInterval(interval);
+    playing = 0;
     n = 17, m = 17;
-    pos = [[Math.ceil(n / 2), Math.ceil(m / 2) - 2]];
+    pos = [[Math.ceil(n / 2), Math.ceil(m / 2) - 6]];
     x = pos[0][0], y = pos[0][1];
     dir = 2, last = 2;
     cur = 5, spawn = 3;
     orb = [];
-    interval = setInterval(update, cd);
+    for(let i = 1; i + 1 < cur; i++) move();
+    update();
 }
 
 function init() {
@@ -61,6 +65,7 @@ function spawnOrb() {
 
 function die() {
     clearInterval(interval);
+    playing = 0;
 }
 
 function move() {
@@ -173,9 +178,14 @@ document.addEventListener('keydown', function(event) {
     if(press == "d" || press == "arrowright") cand = 2;
     if(press == "s" || press == "arrowdown") cand = 3;
     if(press == "a" || press == "arrowleft") cand = 4;
+    if(cand != -1 && playing == 0) {
+        playing = 1;
+        interval = setInterval(update, cd);
+    }
     if(press == " ") reset();
     if(cand != (last + 1) % 4 + 1 && cand != -1 && cand != dir) dir = cand;
 });
 
 init();
-let interval = setInterval(update, cd);
+for(let i = 1; i + 1 < cur; i++) move();
+update();
