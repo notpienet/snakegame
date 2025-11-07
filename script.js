@@ -142,6 +142,11 @@ function checkOpen() {
     if(dir == 3) nx++;
     if(dir == 4) ny--;
     if(nx >= 1 && nx <= n && ny >= 1 && ny <= m) open[nx][ny] = 1;
+    if(dir == 1) nx--;
+    if(dir == 2) ny++;
+    if(dir == 3) nx++;
+    if(dir == 4) ny--;
+    if(nx >= 1 && nx <= n && ny >= 1 && ny <= m) open[nx][ny] = 3;
 }
 
 function checkOrb() {
@@ -310,7 +315,7 @@ function bfs() {
                     vis[nx][ny] = 1;
                     queue.push([nx, ny, i])
                 }
-                if(open[nx][ny] == 2) {
+                if((open[nx][ny] == 2 && acur < cur) || open[nx][ny] == 3) {
                     queue.push([nx, ny, i])
                     i = queue.length - 1;
                     f = 1;
