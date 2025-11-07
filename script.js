@@ -86,10 +86,6 @@ function spawnOrb() {
 
 function die() {
     clearInterval(interval);
-    
-    resetGrid();
-    drawOrb();
-    drawSnake();
 }
 
 function move() {
@@ -295,6 +291,8 @@ function update() {
     if(playing == 1) {
         if(!bfs()) {
             resetGrid();
+            drawOrb();
+            drawSnake();
             checkOpen(false);
             bfs();
         }
