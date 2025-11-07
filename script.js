@@ -1,28 +1,49 @@
-const cd = 100;
 const orb_sprite = "assets/orb.png";
 const empty_sprite = "assets/-.png";
 const game = document.getElementById("game");
 const g1 = 95, g2 = 58;
+
 let n = 17, m = 17;
-let pos = [[Math.ceil(n / 2), Math.ceil(m / 2) - 6]];
-let x = pos[0][0], y = pos[0][1];
-let dir = 2, last = 2;
-let cur = 5, spawn = 3;
 let orb = [];
+let spawn = 3;
 let open = [0];
+const cd = 100;
 let playing = 0;
 let interval;
+let init_cur = 5;
+let rot = 100;
+
+let init_pos = [-6, -6];
+let init_dir = 2;
+let pos;
+let x, y;
+let dir, last;
+let cur;
+
+let init_apos = [6, 6];
+let init_adir = 4;
+let apos;
+let ax, ay;
+let adir, alast;
+let acur;
 
 function reset() {
     clearInterval(interval);
     playing = 0;
-    n = 17, m = 17;
-    pos = [[Math.ceil(n / 2), Math.ceil(m / 2) - 6]];
+
+    pos = [[Math.ceil(n / 2) + init_pos[0], Math.ceil(m / 2) + init_pos[1]]];
     x = pos[0][0], y = pos[0][1];
-    dir = 2, last = 2;
-    cur = 5, spawn = 3;
+    dir = init_dir, last = dir;
+    cur = init_cur;
     orb = [];
-    for(let i = 1; i + 1 < cur; i++) move();
+    
+    apos = [[Math.ceil(n / 2) + init_apos[0], Math.ceil(m / 2) + init_apos[1]]];
+    ax = apos[0][0], ay = apos[0][1];
+    adir = init_adir, alast = adir;
+    acur = init_cur;
+    orb = [];
+    
+    for(let i = 1; i + 1 < acur; i++) move();
     update();
 }
 
@@ -34,13 +55,13 @@ function init() {
         for(let j = 1; j <= m; j++) {
             const grid = document.createElement("div");
             grid.setAttribute("class", "grid");
-            grid.setAttribute("id", i.toString() + "_" + j.toString());
+            grid.setAttribute("id", i + "_" + j);
             let b = (1 - Math.abs(n / 2 - i) / n) * (1 - Math.abs(m / 2 - j) / n) * 1;
             if((i + j) % 2 == 0) grid.style.backgroundColor = "rgb(" + g1 * b + ", " + g1 * b + ", " + g1 * b + ")";
             else grid.style.backgroundColor = "rgb(" + g2 * b + ", " + g2 * b + ", " + g2 * b + ")";
             const img = document.createElement("img");
             img.setAttribute("class", "gimg");
-            img.setAttribute("id", i.toString() + "." + j.toString());
+            img.setAttribute("id", i + "." + j);
             grid.append(img);
             row.append(grid);
             temp.push(0);
@@ -77,12 +98,22 @@ function move() {
     if(dir == 4) pos.push([x, y - 1]);
     x = pos[pos.length - 1][0];
     y = pos[pos.length - 1][1];
+    
+    ax = apos[apos.length - 1][0];
+    ay = apos[apos.length - 1][1];
+    alast = adir;
+    if(adir == 1) apos.push([ax - 1, ay]);
+    if(adir == 2) apos.push([ax, ay + 1]);
+    if(adir == 3) apos.push([ax + 1, ay]);
+    if(adir == 4) apos.push([ax, ay - 1]);
+    ax = apos[apos.length - 1][0];
+    ay = apos[apos.length - 1][1];
 }
 
 function resetGrid() {
     for(let i = 1; i <= n; i++) {
         for(let j = 1; j <= m; j++) {
-            const img = document.getElementById(i.toString() + "." + j.toString());
+            const img = document.getElementById(i + "." + j);
             img.src = empty_sprite;
             open[i][j] = 0;
         }
@@ -91,7 +122,15 @@ function resetGrid() {
 
 function checkOpen() {
     for(let i = 0; i + 1 < pos.length; i++) {
-        if(pos[i][0] >= 1 && pos[i][0] <= n && pos[i][1] >= 1 && pos[i][1] <= m) open[pos[i][0]][pos[i][1]] = 1;
+        if(pos[i][0] >= 1 && pos[i][0] <= n && pos[i][1] >= 1 && pos[i][1] <= m) {
+            open[pos[i][0]][pos[i][1]] = 1;
+        }
+    }
+    
+    for(let i = 0; i + 1 < apos.length; i++) {
+        if(apos[i][0] >= 1 && apos[i][0] <= n && apos[i][1] >= 1 && apos[i][1] <= m) {
+            open[apos[i][0]][apos[i][1]] = 1;
+        }
     }
     for(let i = 0; i < orb.length; i++) {
         open[orb[i][0]][orb[i][1]] = 1;
@@ -100,10 +139,22 @@ function checkOpen() {
 
 function checkOrb() {
     while(orb.length < spawn && spawnOrb()) {}
-    const neworb = [];
+    let neworb = [];
     for(let i = 0; i < orb.length; i++) {
         if(orb[i][0] == x && orb[i][1] == y) {
             cur++;
+            spawnOrb();
+            continue;
+        }
+        neworb.push([orb[i][0], orb[i][1]]);
+    }
+    orb = neworb;
+
+    neworb = [];
+    while(orb.length < spawn && spawnOrb()) {}
+    for(let i = 0; i < orb.length; i++) {
+        if(orb[i][0] == ax && orb[i][1] == ay) {
+            acur++;
             spawnOrb();
             continue;
         }
@@ -114,7 +165,7 @@ function checkOrb() {
 
 function drawOrb() {
     for(let i = 0; i < orb.length; i++) {
-        const img = document.getElementById(orb[i][0].toString() + "." + orb[i][1].toString());
+        const img = document.getElementById(orb[i][0] + "." + orb[i][1]);
         img.src = orb_sprite;
         img.style.filter = "brightness(1)";
     }
@@ -129,29 +180,70 @@ function drawSnake() {
         if(pos[i + 1][1] == pos[i][1] - 1) b = 4;
         if(pos[i][0] >= 1 && pos[i][0] <= n && pos[i][1] >= 1 && pos[i][1] <= m) {
             open[pos[i][0]][pos[i][1]] = 1;
-            const img = document.getElementById(pos[i][0].toString() + "." + pos[i][1].toString());
-            img.src = "assets/" + Math.min(a, b).toString() + Math.max(a, b).toString() + ".png";
+            const img = document.getElementById(pos[i][0] + "." + pos[i][1]);
+            img.src = "assets/" + Math.min(a, b) + Math.max(a, b) + ".png";
             const fade = Math.min(1, pos.length * 0.1) * i / (pos.length - 1);
-            img.style.filter = "brightness(" + (Math.max(0.5, 1 - pos.length * 0.05) + fade * 0.5).toString() + ")";
+            img.style.filter = "brightness(" + (Math.max(0.5, 1 - pos.length * 0.05) + fade * 0.5) + ") hue-rotate(0deg)";
         }
         a = ((b + 1) % 4 + 1);
     }
     if(x >= 1 && x <= n && y >= 1 && y <= m) {
-        const temp = document.getElementById(x.toString() + "." + y.toString());
-        temp.src = "assets/0" + a.toString() + ".png";
-        temp.style.filter = "brightness(1)";
+        const temp = document.getElementById(x + "." + y);
+        temp.src = "assets/0" + a + ".png";
+        temp.style.filter = "brightness(1) hue-rotate(0deg)";
+    }
+
+    
+    a = 0, b = 0;
+    for(let i = 0; i + 1 < apos.length; i++) {
+        if(apos[i + 1][0] == apos[i][0] + 1) b = 3;
+        if(apos[i + 1][0] == apos[i][0] - 1) b = 1;
+        if(apos[i + 1][1] == apos[i][1] + 1) b = 2;
+        if(apos[i + 1][1] == apos[i][1] - 1) b = 4;
+        if(apos[i][0] >= 1 && apos[i][0] <= n && apos[i][1] >= 1 && apos[i][1] <= m) {
+            open[apos[i][0]][apos[i][1]] = 1;
+            const img = document.getElementById(apos[i][0] + "." + apos[i][1]);
+            img.src = "assets/" + Math.min(a, b) + Math.max(a, b) + ".png";
+            const fade = Math.min(1, apos.length * 0.1) * i / (apos.length - 1);
+            img.style.filter = "brightness(" + (Math.max(0.5, 1 - apos.length * 0.05) + fade * 0.5) + ") hue-rotate(" + rot + "deg)";
+        }
+        a = ((b + 1) % 4 + 1);
+    }
+    if(ax >= 1 && ax <= n && ay >= 1 && ay <= m) {
+        const temp = document.getElementById(ax + "." + ay);
+        temp.src = "assets/0" + a + ".png";
+        temp.style.filter = "brightness(1) hue-rotate(" + rot + "deg)";
     }
 }
 
 function checkHit() {
     if(pos.length > cur) pos.shift();
-    if(x < 1 || x > n || y < 1 || y > m) {
+    if(apos.length > acur) apos.shift();
+    if(x < 1 || x > n || y < 1 || y > m || ax < 1 || ax > n || ay < 1 || ay > m) {
         die();
         return false;
     }
     else {
+        if(x == ax && y == ay) { //draw
+            die();
+            return false;
+        }
         for(let i = 0; i + 1 < pos.length; i++) {
-            if(pos[i][0] == x && pos[i][1] == y) {
+            if(pos[i][0] == x && pos[i][1] == y) { //p1 tabrak diri sendiri
+                die();
+                return false;
+            }
+            if(pos[i][0] == ax && pos[i][1] == ay) { //p2 tabrak p1
+                die();
+                return false;
+            }
+        }
+        for(let i = 0; i + 1 < apos.length; i++) {
+            if(apos[i][0] == x && apos[i][1] == y) { //p1 tabrak p2
+                die();
+                return false;
+            }
+            if(apos[i][0] == ax && apos[i][1] == ay) { //p2 tabrak diri sendiri
                 die();
                 return false;
             }
@@ -172,19 +264,23 @@ function update() {
 
 document.addEventListener('keydown', function(event) {
     let press = event.key.toLowerCase();
-    let cand = -1;
-    if(press == "w" || press == "arrowup") cand = 1;
-    if(press == "d" || press == "arrowright") cand = 2;
-    if(press == "s" || press == "arrowdown") cand = 3;
-    if(press == "a" || press == "arrowleft") cand = 4;
-    if(cand != -1 && playing == 0) {
+    let cand = -1, acand = -1;
+    if(press == "w") cand = 1;
+    if(press == "d") cand = 2;
+    if(press == "s") cand = 3;
+    if(press == "a") cand = 4;
+    if(press == "arrowup") acand = 1;
+    if(press == "arrowright") acand = 2;
+    if(press == "arrowdown") acand = 3;
+    if(press == "arrowleft") acand = 4;
+    if((cand != -1 || acand != -1) && playing == 0) {
         playing = 1;
         interval = setInterval(update, cd);
     }
     if(press == " ") reset();
     if(cand != (last + 1) % 4 + 1 && cand != -1 && cand != dir) dir = cand;
+    if(acand != (alast + 1) % 4 + 1 && acand != -1 && acand != adir) adir = acand;
 });
 
 init();
-for(let i = 1; i + 1 < cur; i++) move();
-update();
+reset();
