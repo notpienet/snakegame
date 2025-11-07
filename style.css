@@ -38,13 +38,19 @@ p {
 
 #ver {
     position: absolute;
-    right: 0px;
-    bottom: 0px;
+    right: 10px;
+    bottom: 10px;
 }
 
 #icon {
     width: 40px;
     height: 40px;
+}
+
+#stats {
+    position: absolute;
+    left: 10px;
+    bottom: 10px;
 }
 
 #game {
