@@ -325,16 +325,16 @@ function bfs() {
         for(let j = 0; j < 4; j++) {
             let nx = queue[i][0] + moves[j][0], ny = queue[i][1] + moves[j][1];
             if(nx >= 1 && nx <= n && ny >= 1 && ny <= m && vis[nx][ny] == 0) {
-                if(open[nx][ny] == 0) {
-                    vis[nx][ny] = 1;
-                    queue.push([nx, ny, i])
-                }
                 let goOrb = (acur <= cur) || !(nx > 1 && nx < n && ny > 1 && ny < m);
                 if((open[nx][ny] == 2 && goOrb) || (open[nx][ny] == 3 && !goOrb)) {
                     queue.push([nx, ny, i])
                     i = queue.length - 1;
                     f = 1;
                     break;
+                }
+                else if(open[nx][ny] != 1) {
+                    vis[nx][ny] = 1;
+                    queue.push([nx, ny, i])
                 }
             }
         }
