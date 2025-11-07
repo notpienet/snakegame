@@ -139,8 +139,12 @@ function checkOpen(openNext) {
     }
     let nx = x + targ[dir][0], ny = y + targ[dir][1];
     if(openNext && nx >= 1 && nx <= n && ny >= 1 && ny <= m) open[nx][ny] = 1;
-    nx += targ[dir][0], ny += targ[dir][1];
-    while(nx >= 1 && nx <= n && ny >= 1 && ny <= m && open[nx][ny] == 0) open[nx][ny] = 3;
+
+    nx = x, ny = y;
+    while(nx >= 1 && nx <= n && ny >= 1 && ny <= m) {
+        if(open[nx][ny] == 0) open[nx][ny] = 3;
+        nx += targ[dir][0], ny += targ[dir][1];
+    }
     if(!openNext) return;
     for(let i = 1; i <= n; i++) {
         for(let j = 1; j <= m; j++) {
@@ -307,6 +311,34 @@ function update() {
 
 let moves = [[-1, 0], [0, 1], [1, 0], [0, -1]];
 
+function floodFill(tx, ty) {
+    let temp = open[tx][ty];
+    open[tx][ty] = 1;
+    let i = 0;
+    let queue = [[tx, ty]];
+    let vis = [];
+    for(let j = 0; j <= n; j++) {
+        let temp = [];
+        for(let k = 0; k <= m; k++) {
+            temp.push(0);
+        }
+        vis.push(temp);
+    }
+    vis[tx][ty] = 1;
+    while(i < queue.length) {   
+        for(let j = 0; j < 4; j++) {
+            let nx = queue[i][0] + moves[j][0], ny = queue[i][1] + moves[j][1];
+            if(nx >= 1 && nx <= n && ny >= 1 && ny <= m && vis[nx][ny] == 0 && (open[nx][ny] == 0 || open[nx][ny] == 2)) {
+                vis[nx][ny] = 1;
+                queue.push([nx, ny])
+            }
+        }
+        i++;
+    }
+    open[tx][ty] = temp;
+    return queue.length;
+}
+
 function bfs() {
     let i = 0;
     let queue = [[ax, ay, -1]];
@@ -320,13 +352,14 @@ function bfs() {
     }
     vis[queue[0][0]][queue[0][1]] = 1;
     let turn = 0;
-    while(i < queue.length) {
+    while(i < queue.length) {   
         let f = 0;
         for(let j = 0; j < 4; j++) {
             let nx = queue[i][0] + moves[j][0], ny = queue[i][1] + moves[j][1];
             if(nx >= 1 && nx <= n && ny >= 1 && ny <= m && vis[nx][ny] == 0) {
-                let goOrb = (acur <= cur) || !(nx > 1 && nx < n && ny > 1 && ny < m);
-                if((open[nx][ny] == 2 && goOrb) || (open[nx][ny] == 3 && !goOrb)) {
+                let goOrb = acur <= cur || !(nx > 1 && nx < n && ny > 1 && ny < m);
+                let fill = floodFill(nx, ny);
+                if(fill >= acur + 2 && ((open[nx][ny] == 2 && goOrb) || (open[nx][ny] == 3 && !goOrb))) {
                     queue.push([nx, ny, i])
                     i = queue.length - 1;
                     f = 1;
@@ -349,6 +382,12 @@ function bfs() {
     if(queue[i][0] == ax - 1) adir = 1;
     if(queue[i][1] == ay + 1) adir = 2;
     if(queue[i][1] == ay - 1) adir = 4;
+    if(ax == 1 || ax == n || ay == 1 || ay == m) {
+        if(dir == 3 && ax - 1 >= 1 && open[ax - 1][ay] != 1 && alast != 3) adir = 1;
+        else if(dir == 1 && ax + 1 <= n && open[ax + 1][ay] != 1 && alast != 1) adir = 3;
+        else if(dir == 4 && ay - 1 >= 1 && open[ax][ay - 1] != 1 && alast != 4) adir = 2;
+        else if(dir == 2 && ay + 1 <= m && open[ax][ay + 1] != 1 && alast != 2) adir = 4;
+    }
     if(queue.length == 1) return false;
     return true;
 }
@@ -360,17 +399,12 @@ document.addEventListener('keydown', function(event) {
     if(press == "d" || press == "arrowright") cand = 2;
     if(press == "s" || press == "arrowdown") cand = 3;
     if(press == "a" || press == "arrowleft") cand = 4;
-    // if(press == "arrowup") acand = 1;
-    // if(press == "arrowright") acand = 2;
-    // if(press == "arrowdown") acand = 3;
-    // if(press == "arrowleft") acand = 4;
     if(cand != -1 && playing == 0) {
         playing = 1;
         interval = setInterval(update, cd);
     }
     if(press == " ") reset();
     if(cand != (last + 1) % 4 + 1 && cand != -1 && cand != dir) dir = cand;
-    // if(acand != (alast + 1) % 4 + 1 && acand != -1 && acand != adir) adir = acand;
 });
 
 init();
