@@ -378,15 +378,17 @@ function bfs() {
     while(queue[i][2] != 0 && i > 0) {
         i = queue[i][2];
     }
-    if(queue[i][0] == ax + 1) adir = 3;
-    if(queue[i][0] == ax - 1) adir = 1;
-    if(queue[i][1] == ay + 1) adir = 2;
-    if(queue[i][1] == ay - 1) adir = 4;
+    if(queue[i][0] > ax) adir = 3;
+    if(queue[i][0] < ax) adir = 1;
+    if(queue[i][1] > ay) adir = 2;
+    if(queue[i][1] < ay) adir = 4;
     if(ax == 1 || ax == n || ay == 1 || ay == m) {
+        let temp = adir;
         if(dir == 3 && ax - 1 >= 1 && open[ax - 1][ay] != 1 && alast != 3) adir = 1;
         else if(dir == 1 && ax + 1 <= n && open[ax + 1][ay] != 1 && alast != 1) adir = 3;
-        else if(dir == 4 && ay - 1 >= 1 && open[ax][ay - 1] != 1 && alast != 4) adir = 2;
-        else if(dir == 2 && ay + 1 <= m && open[ax][ay + 1] != 1 && alast != 2) adir = 4;
+        else if(dir == 4 && ay + 1 <= m && open[ax][ay + 1] != 1 && alast != 4) adir = 2;
+        else if(dir == 2 && ay - 1 >= 1 && open[ax][ay - 1] != 1 && alast != 2) adir = 4;
+        if(adir != temp) return true;
     }
     if(queue.length == 1) return false;
     return true;
