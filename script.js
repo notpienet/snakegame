@@ -132,8 +132,9 @@ function checkOpen() {
             open[apos[i][0]][apos[i][1]] = 1;
         }
     }
+
     for(let i = 0; i < orb.length; i++) {
-        open[orb[i][0]][orb[i][1]] = 1;
+        open[orb[i][0]][orb[i][1]] = 2;
     }
 }
 
@@ -224,7 +225,7 @@ function checkHit() {
         return false;
     }
     else {
-        if(x == ax && y == ay) { //draw
+        if(x == ax && y == ay) { //dua2ny mati
             die();
             return false;
         }
@@ -253,13 +254,60 @@ function checkHit() {
 }
 
 function update() {
-    move()
+    move();
     checkOpen();
+    if(playing == 1) bfs();
     checkOrb();
     if(!checkHit()) return;
     resetGrid();
     drawOrb();
     drawSnake();
+}
+
+
+let moves = [[-1, 0], [0, 1], [1, 0], [0, -1]];
+
+function bfs() {
+    let i = 0;
+    let queue = [[ax, ay, -1]];
+    let vis = [];
+    for(let j = 0; j <= n; j++) {
+        let temp = [];
+        for(let k = 0; k <= m; k++) {
+            temp.push(0);
+        }
+        vis.push(temp);
+    }
+    vis[queue[0][0]][queue[0][1]] = 1;
+    while(i < queue.length) {
+        let f = 0;
+        for(let j = 0; j < 4; j++) {
+            let nx = queue[i][0] + moves[j][0], ny = queue[i][1] + moves[j][1];
+            if(nx >= 1 && nx <= n && ny >= 1 && ny <= m && vis[nx][ny] == 0) {
+                if(open[nx][ny] == 0) {
+                    vis[nx][ny] = 1;
+                    queue.push([nx, ny, i])
+                }
+                if(open[nx][ny] == 2) {
+                    queue.push([nx, ny, i])
+                    i = queue.length - 1;
+                    f = 1;
+                    break;
+                }
+            }
+        }
+        if(f == 1) break;
+        i++;
+    }
+    while(queue[i][2] != 0 && i > 0) {
+        i = queue[i][2];
+    }
+    console.log(i);
+    if(queue[i][0] == ax + 1) adir = 3;
+    if(queue[i][0] == ax - 1) adir = 1;
+    if(queue[i][1] == ay + 1) adir = 2;
+    if(queue[i][1] == ay - 1) adir = 4;
+    console.log(queue);
 }
 
 document.addEventListener('keydown', function(event) {
@@ -269,17 +317,17 @@ document.addEventListener('keydown', function(event) {
     if(press == "d") cand = 2;
     if(press == "s") cand = 3;
     if(press == "a") cand = 4;
-    if(press == "arrowup") acand = 1;
-    if(press == "arrowright") acand = 2;
-    if(press == "arrowdown") acand = 3;
-    if(press == "arrowleft") acand = 4;
-    if((cand != -1 || acand != -1) && playing == 0) {
+    // if(press == "arrowup") acand = 1;
+    // if(press == "arrowright") acand = 2;
+    // if(press == "arrowdown") acand = 3;
+    // if(press == "arrowleft") acand = 4;
+    if(cand != -1 && playing == 0) {
         playing = 1;
         interval = setInterval(update, cd);
     }
     if(press == " ") reset();
     if(cand != (last + 1) % 4 + 1 && cand != -1 && cand != dir) dir = cand;
-    if(acand != (alast + 1) % 4 + 1 && acand != -1 && acand != adir) adir = acand;
+    // if(acand != (alast + 1) % 4 + 1 && acand != -1 && acand != adir) adir = acand;
 });
 
 init();
