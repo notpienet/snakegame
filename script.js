@@ -11,7 +11,7 @@ const cd = 100;
 let playing = 0;
 let interval;
 let init_cur = 5;
-let rot = 100;
+let rot = 115;
 
 let init_pos = [-6, -6];
 let init_dir = 2;
@@ -121,6 +121,10 @@ function resetGrid() {
 }
 
 function checkOpen() {
+    for(let i = 0; i < orb.length; i++) {
+        open[orb[i][0]][orb[i][1]] = 2;
+    }
+
     for(let i = 0; i + 1 < pos.length; i++) {
         if(pos[i][0] >= 1 && pos[i][0] <= n && pos[i][1] >= 1 && pos[i][1] <= m) {
             open[pos[i][0]][pos[i][1]] = 1;
@@ -131,10 +135,6 @@ function checkOpen() {
         if(apos[i][0] >= 1 && apos[i][0] <= n && apos[i][1] >= 1 && apos[i][1] <= m) {
             open[apos[i][0]][apos[i][1]] = 1;
         }
-    }
-
-    for(let i = 0; i < orb.length; i++) {
-        open[orb[i][0]][orb[i][1]] = 2;
     }
     let nx = x, ny = y;
     if(dir == 1) nx--;
@@ -228,43 +228,58 @@ function checkHit() {
     if(apos.length > acur) apos.shift();
     if(x < 1 || x > n || y < 1 || y > m || ax < 1 || ax > n || ay < 1 || ay > m) {
         die();
+        console.log("Player went outside the map");
         return false;
     }
     else {
         let w = 0;
         if(x == ax && y == ay) { //dua2ny mati
+            if(cur > acur) w = 1;
+            else w = 2;
             die();
-            return false;
+            console.log("Bump");
         }
         for(let i = 0; i + 1 < pos.length; i++) {
             if(pos[i][0] == x && pos[i][1] == y) { //p1 tabrak diri sendiri
+                w = 2;
                 die();
-                return false;
+                console.log("Player hit themselves");
+                break;
             }
             if(pos[i][0] == ax && pos[i][1] == ay) { //p2 tabrak p1
+                w = 1;
                 die();
-                return false;
+                console.log("Computer hit player");
+                break;
             }
         }
         for(let i = 0; i + 1 < apos.length; i++) {
             if(apos[i][0] == x && apos[i][1] == y) { //p1 tabrak p2
+                w = 2;
                 die();
-                return false;
+                console.log("Player hit computer");
+                break;
             }
             if(apos[i][0] == ax && apos[i][1] == ay) { //p2 tabrak diri sendiri
+                w = 1;
                 die();
-                return false;
+                console.log("Computer hit themselves");
+                break;
             }
+        }
+        if(w !== 0) {
+            die();
+            return false;
         }
     }
     return true;
 }
 
 function update() {
+    checkOrb();
     checkOpen();
     if(playing == 1) bfs();
     move();
-    checkOrb();
     if(!checkHit()) return;
     resetGrid();
     drawOrb();
@@ -306,6 +321,7 @@ function bfs() {
         if(f == 1) break;
         i++;
     }
+    i = Math.min(queue.length - 1, i);
     while(queue[i][2] != 0 && i > 0) {
         i = queue[i][2];
     }
