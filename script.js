@@ -120,7 +120,8 @@ function resetGrid() {
     }
 }
 
-function checkOpen() {
+let targ = [[-1, 0], [0, 1], [1, 0], [0, -1]];
+function checkOpen(openNext) {
     for(let i = 0; i < orb.length; i++) {
         open[orb[i][0]][orb[i][1]] = 2;
     }
@@ -141,12 +142,16 @@ function checkOpen() {
     if(dir == 2) ny++;
     if(dir == 3) nx++;
     if(dir == 4) ny--;
-    if(nx >= 1 && nx <= n && ny >= 1 && ny <= m) open[nx][ny] = 1;
-    if(dir == 1) nx--;
-    if(dir == 2) ny++;
-    if(dir == 3) nx++;
-    if(dir == 4) ny--;
-    if(nx >= 1 && nx <= n && ny >= 1 && ny <= m) open[nx][ny] = 3;
+    if(openNext && nx >= 1 && nx <= n && ny >= 1 && ny <= m) open[nx][ny] = 1;
+    targ.push(targ[0]);
+    targ.shift();
+    for(let i = 0; i < 4; i++) {
+        nx = x + targ[i][0], ny = y + targ[i][1];
+        if(nx >= 1 && nx <= n && ny >= 1 && ny <= m && open[nx][ny] != 1) {
+            open[nx][ny] = 3;
+            break;
+        }
+    }
 }
 
 function checkOrb() {
@@ -282,8 +287,13 @@ function checkHit() {
 
 function update() {
     checkOrb();
-    checkOpen();
-    if(playing == 1) bfs();
+    checkOpen(true);
+    if(playing == 1) {
+        if(!bfs()) {
+            checkOpen(false);
+            bfs();
+        }
+    }
     move();
     if(!checkHit()) return;
     resetGrid();
@@ -315,7 +325,7 @@ function bfs() {
                     vis[nx][ny] = 1;
                     queue.push([nx, ny, i])
                 }
-                if((open[nx][ny] == 2 && acur < cur) || open[nx][ny] == 3) {
+                if((open[nx][ny] == 2 && acur <= cur) || open[nx][ny] == 3) {
                     queue.push([nx, ny, i])
                     i = queue.length - 1;
                     f = 1;
@@ -334,6 +344,8 @@ function bfs() {
     if(queue[i][0] == ax - 1) adir = 1;
     if(queue[i][1] == ay + 1) adir = 2;
     if(queue[i][1] == ay - 1) adir = 4;
+    if(queue.length == 1) return false;
+    return true;
 }
 
 document.addEventListener('keydown', function(event) {

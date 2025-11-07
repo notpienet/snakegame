@@ -36,6 +36,12 @@ p {
     z-index: 10;
 }
 
+#ver {
+    position: absolute;
+    right: 0px;
+    bottom: 0px;
+}
+
 #icon {
     width: 40px;
     height: 40px;
