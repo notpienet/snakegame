@@ -73,8 +73,8 @@ function init() {
 
 function spawnOrb() {
     const cand = [];
-    for(let i = 1; i <= n; i++) {
-        for(let j = 1; j <= m; j++) {
+    for(let i = 2; i < n; i++) {
+        for(let j = 2; j < m; j++) {
             if(open[i][j] == 0) cand.push([i, j]);
         }
     }
@@ -120,7 +120,7 @@ function resetGrid() {
     }
 }
 
-let targ = [[-1, 0], [0, 1], [1, 0], [0, -1]];
+let targ = [0, [-1, 0], [0, 1], [1, 0], [0, -1]];
 function checkOpen(openNext) {
     for(let i = 0; i < orb.length; i++) {
         open[orb[i][0]][orb[i][1]] = 2;
@@ -137,19 +137,14 @@ function checkOpen(openNext) {
             open[apos[i][0]][apos[i][1]] = 1;
         }
     }
-    let nx = x, ny = y;
-    if(dir == 1) nx--;
-    if(dir == 2) ny++;
-    if(dir == 3) nx++;
-    if(dir == 4) ny--;
+    let nx = x + targ[dir][0], ny = y + targ[dir][1];
     if(openNext && nx >= 1 && nx <= n && ny >= 1 && ny <= m) open[nx][ny] = 1;
-    targ.push(targ[0]);
-    targ.shift();
-    for(let i = 0; i < 4; i++) {
-        nx = x + targ[i][0], ny = y + targ[i][1];
-        if(nx >= 1 && nx <= n && ny >= 1 && ny <= m && open[nx][ny] != 1) {
-            open[nx][ny] = 3;
-            break;
+    nx += targ[dir][0], ny += targ[dir][1];
+    while(nx >= 1 && nx <= n && ny >= 1 && ny <= m && open[nx][ny] == 0) open[nx][ny] = 3;
+    if(!openNext) return;
+    for(let i = 1; i <= n; i++) {
+        for(let j = 1; j <= m; j++) {
+            if(i == 1 || j == 1 || i == n || j == m) open[i][j] = 1;
         }
     }
 }
@@ -236,9 +231,14 @@ function drawSnake() {
 function checkHit() {
     if(pos.length > cur) pos.shift();
     if(apos.length > acur) apos.shift();
-    if(x < 1 || x > n || y < 1 || y > m || ax < 1 || ax > n || ay < 1 || ay > m) {
+    if(x < 1 || x > n || y < 1 || y > m) {
         die();
         console.log("Player went outside the map");
+        return false;
+    }
+    else if(ax < 1 || ax > n || ay < 1 || ay > m) {
+        die();
+        console.log("Computer went outside the map");
         return false;
     }
     else {
@@ -290,6 +290,7 @@ function update() {
     checkOpen(true);
     if(playing == 1) {
         if(!bfs()) {
+            resetGrid();
             checkOpen(false);
             bfs();
         }
@@ -316,6 +317,7 @@ function bfs() {
         vis.push(temp);
     }
     vis[queue[0][0]][queue[0][1]] = 1;
+    let turn = 0;
     while(i < queue.length) {
         let f = 0;
         for(let j = 0; j < 4; j++) {
@@ -325,7 +327,8 @@ function bfs() {
                     vis[nx][ny] = 1;
                     queue.push([nx, ny, i])
                 }
-                if((open[nx][ny] == 2 && acur <= cur) || open[nx][ny] == 3) {
+                let goOrb = (acur <= cur) || !(nx > 1 && nx < n && ny > 1 && ny < m);
+                if((open[nx][ny] == 2 && goOrb) || (open[nx][ny] == 3 && !goOrb)) {
                     queue.push([nx, ny, i])
                     i = queue.length - 1;
                     f = 1;
