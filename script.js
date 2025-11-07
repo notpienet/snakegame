@@ -136,6 +136,12 @@ function checkOpen() {
     for(let i = 0; i < orb.length; i++) {
         open[orb[i][0]][orb[i][1]] = 2;
     }
+    let nx = x, ny = y;
+    if(dir == 1) nx--;
+    if(dir == 2) ny++;
+    if(dir == 3) nx++;
+    if(dir == 4) ny--;
+    if(nx >= 1 && nx <= n && ny >= 1 && ny <= m) open[nx][ny] = 1;
 }
 
 function checkOrb() {
@@ -225,6 +231,7 @@ function checkHit() {
         return false;
     }
     else {
+        let w = 0;
         if(x == ax && y == ay) { //dua2ny mati
             die();
             return false;
@@ -254,9 +261,9 @@ function checkHit() {
 }
 
 function update() {
-    move();
     checkOpen();
     if(playing == 1) bfs();
+    move();
     checkOrb();
     if(!checkHit()) return;
     resetGrid();
@@ -302,21 +309,19 @@ function bfs() {
     while(queue[i][2] != 0 && i > 0) {
         i = queue[i][2];
     }
-    console.log(i);
     if(queue[i][0] == ax + 1) adir = 3;
     if(queue[i][0] == ax - 1) adir = 1;
     if(queue[i][1] == ay + 1) adir = 2;
     if(queue[i][1] == ay - 1) adir = 4;
-    console.log(queue);
 }
 
 document.addEventListener('keydown', function(event) {
     let press = event.key.toLowerCase();
     let cand = -1, acand = -1;
-    if(press == "w") cand = 1;
-    if(press == "d") cand = 2;
-    if(press == "s") cand = 3;
-    if(press == "a") cand = 4;
+    if(press == "w" || press == "arrowup") cand = 1;
+    if(press == "d" || press == "arrowright") cand = 2;
+    if(press == "s" || press == "arrowdown") cand = 3;
+    if(press == "a" || press == "arrowleft") cand = 4;
     // if(press == "arrowup") acand = 1;
     // if(press == "arrowright") acand = 2;
     // if(press == "arrowdown") acand = 3;
