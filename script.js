@@ -438,19 +438,12 @@ function bfs() {
     if(nx >= 1 && nx <= n && ny >= 1 && ny <= m) fill = floodFill(nx, ny);
     if(queue.length == 1) return false;
     if(!(nx >= 1 && nx <= n && ny >= 1 && ny <= m) || fill < acur * 2) {
-        for(let j = 0; j < 4; j++) {
-            if(j + 1 == (adir + 1) % 4 + 1) continue;
-            nx = ax + moves[j][0], ny = ay + moves[j][1];
-            if(!(nx >= 1 && nx <= n && ny >= 1 && ny <= m)) continue;
-            if(open[nx][ny] != 1 && floodFill(nx, ny) >= acur * 2) {
-                adir = j + 1;
-                return true;
-            }
-        }
         let ma = -n * m, f = -1;
-        for(j = 0; j < 4; j++) {
+        let start = Math.floor(Math.random() * 100);
+        for(let i = 0; i < 4; i++) {
+            let j = (i + start) % 4;
             if(j + 1 == (adir + 1) % 4 + 1) continue;
-            nx = ax + moves[j][0], ny = ay + moves[j][1];
+            let nx = ax + moves[j][0], ny = ay + moves[j][1];
             if(!(nx >= 1 && nx <= n && ny >= 1 && ny <= m) || open[nx][ny] == 1) continue;
             let cur = floodFill(nx, ny);
             if(cur > ma) {
@@ -459,14 +452,19 @@ function bfs() {
             }
         }
         if(f == -1) {
-            for(let j = 0; j < 4; j++) {
-                nx = ax + moves[j][0], ny = ay + moves[j][1];
+            for(let i = 0; i < 4; i++) {
+                let j = (i + start) % 4;
+                let nx = ax + moves[j][0], ny = ay + moves[j][1];
                 if(!(nx >= 1 && nx <= n && ny >= 1 && ny <= m)) continue;
-                if(open[nx][ny] != 1) f = j + 1;
+                if(open[nx][ny] != 1) {
+                    adir = j + 1;
+                    return true;
+                }
             }
+            return false;
         }
         adir = f;
-        return false;
+        return true;
     }
     return true;
 }
