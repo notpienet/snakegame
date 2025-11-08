@@ -48,7 +48,7 @@ function reset() {
 }
 
 function init() {
-    for(i = 1; i <= n; i++) {
+    for(let i = 1; i <= n; i++) {
         const row = document.createElement("div");
         row.setAttribute("class", "row");
         const temp = [0];
@@ -127,27 +127,24 @@ function checkOpen(openNext) {
         open[orb[i][0]][orb[i][1]] = 2;
     }
 
-    for(let i = 0; i + 1 < pos.length; i++) {
+    for(let i = 0; i < pos.length; i++) {
         if(pos[i][0] >= 1 && pos[i][0] <= n && pos[i][1] >= 1 && pos[i][1] <= m) {
             open[pos[i][0]][pos[i][1]] = 1;
         }
     }
     
-    for(let i = 0; i + 1 < apos.length; i++) {
+    for(let i = 0; i < apos.length; i++) {
         if(apos[i][0] >= 1 && apos[i][0] <= n && apos[i][1] >= 1 && apos[i][1] <= m) {
             open[apos[i][0]][apos[i][1]] = 1;
         }
     }
     let nx = x + targ[dir][0], ny = y + targ[dir][1];
     if(openNext && nx >= 1 && nx <= n && ny >= 1 && ny <= m) open[nx][ny] = 1;
-    nx += targ[dir][0], ny += targ[dir][1];
-    while(nx >= 1 && nx <= n && ny >= 1 && ny <= m && open[nx][ny] == 0) open[nx][ny] = 3;
-    if(!openNext) return;
-    for(let i = 1; i <= n; i++) {
-        for(let j = 1; j <= m; j++) {
-            if(i == 1 || j == 1 || i == n || j == m) open[i][j] = 1;
-        }
+    while(nx >= 1 && nx <= n && ny >= 1 && ny <= m) {
+        if(open[nx][ny] == 0 || open[nx][ny] == 2) open[nx][ny] = 3;
+        nx += targ[dir][0], ny += targ[dir][1];
     }
+    if(!openNext) return;
 }
 
 function checkOrb() {
@@ -269,8 +266,7 @@ function checkHit() {
         }
     }
     if(w !== 0) {
-        if(w == 1) wins += 1;
-        else if(w == 3) wins += 0.5;
+        if(w == 1) wins++;
         games++;
         die();
         return false;
@@ -300,39 +296,99 @@ function update() {
 
 let moves = [[-1, 0], [0, 1], [1, 0], [0, -1]];
 function floodFill(tx, ty) {
-    let cx = x + targ[dir][0], cy = x + targ[dir][0];
+    let cx = x + targ[dir][0], cy = y + targ[dir][1];
     let temp = -1;
     if(cx >= 1 && cx <= n && cy >= 1 && cy <= m) {
-        temp = open[x + targ[dir][0]][y + targ[dir][1]];
-        open[x + targ[dir][0]][y + targ[dir][1]] = 1;
+        temp = open[cx][cy];
+        open[cx][cy] = 1;
     }
     let i = 0;
     let queue = [[tx, ty]];
     let vis = [];
     for(let j = 0; j <= n; j++) {
-        let temp = [];
+        let atemp = [];
         for(let k = 0; k <= m; k++) {
-            temp.push(0);
+            atemp.push(0);
         }
-        vis.push(temp);
+        vis.push(atemp);
     }
     vis[tx][ty] = 1;
     while(i < queue.length) {   
         for(let j = 0; j < 4; j++) {
             let nx = queue[i][0] + moves[j][0], ny = queue[i][1] + moves[j][1];
-            if(nx >= 1 && nx <= n && ny >= 1 && ny <= m && vis[nx][ny] == 0 && open[nx][ny] != 1) {
+            if(nx >= 1 && nx <= n && ny >= 1 && ny <= m && vis[nx][ny] == 0 && (open[nx][ny] == 0 || open[nx][ny] == 2)) {
                 vis[nx][ny] = 1;
                 queue.push([nx, ny])
             }
         }
         i++;
     }
-    if(temp != -1) open[x + targ[dir][0]][y + targ[dir][1]] = temp;
+    if(temp != -1) open[cx][cy] = temp;
+    if(!checkTail(tx, ty)) return 0;
     return queue.length;
+}
+
+function checkTail(tx, ty) {
+    let cx = apos[0][0], cy = apos[0][1];
+    let temp = open[cx][cy];
+    open[cx][cy] = 4;
+    let i = 0;
+    let queue = [[tx, ty]];
+    let vis = [];
+    for(let j = 0; j <= n; j++) {
+        let atemp = [];
+        for(let k = 0; k <= m; k++) {
+            atemp.push(0);
+        }
+        vis.push(atemp);
+    }
+    vis[tx][ty] = 1;
+    while(i < queue.length) {   
+        for(let j = 0; j < 4; j++) {
+            let nx = queue[i][0] + moves[j][0], ny = queue[i][1] + moves[j][1];
+            if(nx >= 1 && nx <= n && ny >= 1 && ny <= m && vis[nx][ny] == 0 && (open[nx][ny] == 0 || open[nx][ny] == 2)) {
+                vis[nx][ny] = 1;
+                queue.push([nx, ny])
+            }
+            if(nx >= 1 && nx <= n && ny >= 1 && ny <= m && open[nx][ny] == 4) {
+                open[cx][cy] = temp;
+                return true;
+            }
+        }
+        i++;
+    }
+    open[cx][cy] = temp;
+    return false;
 }
 
 
 function bfs() {
+    if(ax == 1 || ax == n || ay == 1 || ay == m) {
+        let ma = -1, f = -1;
+        for(j = 0; j < 4; j++) {
+            if(j + 1 == (adir + 1) % 4 + 1) continue;
+            let nx = ax + moves[j][0], ny = ay + moves[j][1];
+            if(!(nx >= 1 && nx <= n && ny >= 1 && ny <= m) || open[nx][ny] == 1) continue;
+            let cur = floodFill(nx, ny);
+            if(cur > ma) {
+                ma = cur;
+                f = j + 1;
+            }
+        }
+        if(f == -1) {
+            for(let j = 0; j < 4; j++) {
+                let nx = ax + moves[j][0], ny = ay + moves[j][1];
+                if(!(nx >= 1 && nx <= n && ny >= 1 && ny <= m)) continue;
+                if(open[nx][ny] != 1) {
+                    adir = j + 1;
+                    return true;
+                }
+            }
+            return false;
+        }
+        adir = f;
+        return true;
+    }
     let i = 0;
     let queue = [[ax, ay, -1]];
     let vis = [];
@@ -344,15 +400,14 @@ function bfs() {
         vis.push(temp);
     }
     vis[queue[0][0]][queue[0][1]] = 1;
-    let turn = 0;
     while(i < queue.length) {
         let f = 0;
         for(let j = 0; j < 4; j++) {
             let nx = queue[i][0] + moves[j][0], ny = queue[i][1] + moves[j][1];
             if(nx >= 1 && nx <= n && ny >= 1 && ny <= m && vis[nx][ny] == 0) {
                 let fill = floodFill(nx, ny);
-                let goOrb = ((acur <= cur) || !(nx > 1 && nx < n && ny > 1 && ny < m)) && (fill >= acur * 2);
-                if((open[nx][ny] == 2 && goOrb) || (open[nx][ny] == 3 && !goOrb)) {
+                let goOrb = ((acur <= cur) || !(nx > 1 && nx < n && ny > 1 && ny < m));
+                if(fill != 0 && ((open[nx][ny] == 2 && goOrb) || (open[nx][ny] == 3 && !goOrb))) {
                     queue.push([nx, ny, i])
                     i = queue.length - 1;
                     f = 1;
@@ -375,18 +430,41 @@ function bfs() {
     if(queue[i][0] == ax - 1) adir = 1;
     if(queue[i][1] == ay + 1) adir = 2;
     if(queue[i][1] == ay - 1) adir = 4;
-    if(ax == 1 || ax == n || ay == 1 || ay == m) {
-        let temp = adir;
-        if(dir == 3 && ax - 1 >= 1 && open[ax - 1][ay] != 1 && alast != 3) adir = 1;
-        else if(dir == 1 && ax + 1 <= n && open[ax + 1][ay] != 1 && alast != 1) adir = 3;
-        else if(dir == 4 && ay + 1 <= m && open[ax][ay + 1] != 1 && alast != 4) adir = 2;
-        else if(dir == 2 && ay - 1 >= 1 && open[ax][ay - 1] != 1 && alast != 2) adir = 4;
-        if(adir != temp) return true;
-    }
     let nx = ax + targ[adir][0], ny = ay + targ[adir][1];
-    if(!(nx >= 1 && nx <= n && ny >= 1 && ny <= m)) return false;
-    let fill = floodFill(nx, ny);
-    if(queue.length == 1 || fill < acur * 2) return false;
+    let fill = 0;
+    if(nx >= 1 && nx <= n && ny >= 1 && ny <= m) fill = floodFill(nx, ny);
+    if(queue.length == 1) return false;
+    if(!(nx >= 1 && nx <= n && ny >= 1 && ny <= m) || fill < acur * 2) {
+        for(let j = 0; j < 4; j++) {
+            if(j + 1 == (adir + 1) % 4 + 1) continue;
+            nx = ax + moves[j][0], ny = ay + moves[j][1];
+            if(!(nx >= 1 && nx <= n && ny >= 1 && ny <= m)) continue;
+            if(open[nx][ny] != 1 && floodFill(nx, ny) >= acur * 2) {
+                adir = j + 1;
+                return true;
+            }
+        }
+        let ma = -1, f = -1;
+        for(j = 0; j < 4; j++) {
+            if(j + 1 == (adir + 1) % 4 + 1) continue;
+            nx = ax + moves[j][0], ny = ay + moves[j][1];
+            if(!(nx >= 1 && nx <= n && ny >= 1 && ny <= m) || open[nx][ny] == 1) continue;
+            let cur = floodFill(nx, ny);
+            if(cur > ma) {
+                ma = cur;
+                f = j + 1;
+            }
+        }
+        if(f == -1) {
+            for(let j = 0; j < 4; j++) {
+                nx = ax + moves[j][0], ny = ay + moves[j][1];
+                if(!(nx >= 1 && nx <= n && ny >= 1 && ny <= m)) continue;
+                if(open[nx][ny] != 1) f = j + 1;
+            }
+        }
+        adir = f;
+        return false;
+    }
     return true;
 }
 
