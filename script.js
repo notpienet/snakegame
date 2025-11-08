@@ -35,13 +35,11 @@ function reset() {
     x = pos[0][0], y = pos[0][1];
     dir = init_dir, last = dir;
     cur = init_cur;
-    orb = [];
     
     apos = [[Math.ceil(n / 2) + init_apos[0], Math.ceil(m / 2) + init_apos[1]]];
     ax = apos[0][0], ay = apos[0][1];
     adir = init_adir, alast = adir;
     acur = init_cur;
-    orb = [];
     
     for(let i = 1; i + 1 < acur; i++) move();
     update();

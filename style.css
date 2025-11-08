@@ -21,9 +21,15 @@ body {
 }
 
 h1 {
-    font-size: 50px;
+    font-size: 42px;
+    font-weight: 600;
     margin: 0px;
-    color: #5971dd;
+    background: -webkit-linear-gradient(right, #5971dd, #be444e);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-family: "Oxanium", sans-serif;
+    margin-top: 15px;
 }
 
 p {
