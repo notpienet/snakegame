@@ -280,9 +280,9 @@ function update() {
     checkOrb();
     checkOpen(true);
     if(playing == 1) {
-        if(!bfs()) {
+        if(!bfs(true)) {
             checkOpen(false);
-            bfs();
+            bfs(false);
         }
     }
     move();
@@ -294,8 +294,8 @@ function update() {
 
 
 let moves = [[-1, 0], [0, 1], [1, 0], [0, -1]];
-function floodFill(tx, ty) {
-    checkOpen(false);
+function floodFill(tx, ty, cond) {
+    checkOpen(cond);
     let cx = x + targ[dir][0], cy = y + targ[dir][1];
     let temp = -1;
     if(cx >= 1 && cx <= n && cy >= 1 && cy <= m) {
@@ -324,12 +324,12 @@ function floodFill(tx, ty) {
         i++;
     }
     if(temp != -1) open[cx][cy] = temp;
-    if(!checkTail(tx, ty)) return queue.length - (n * m);
+    if(!checkTail(tx, ty, cond)) return queue.length - (n * m);
     return queue.length;
 }
 
-function checkTail(tx, ty) {
-    checkOpen(false);
+function checkTail(tx, ty, cond) {
+    checkOpen(cond);
     let cx = apos[0][0], cy = apos[0][1];
     let temp = open[cx][cy];
     open[cx][cy] = 4;
@@ -363,7 +363,7 @@ function checkTail(tx, ty) {
 }
 
 
-function bfs() {
+function bfs(cond) {
     if(ax == 1 || ax == n || ay == 1 || ay == m) {
         let ma = -n * m, f = -1;
         let start = Math.floor(Math.random() * 100);
@@ -372,7 +372,7 @@ function bfs() {
             if(j + 1 == (adir + 1) % 4 + 1) continue;
             let nx = ax + moves[j][0], ny = ay + moves[j][1];
             if(!(nx >= 1 && nx <= n && ny >= 1 && ny <= m) || open[nx][ny] == 1) continue;
-            let cur = floodFill(nx, ny);
+            let cur = floodFill(nx, ny, cond);
             if(cur > ma) {
                 ma = cur;
                 f = j + 1;
@@ -409,7 +409,7 @@ function bfs() {
         for(let j = 0; j < 4; j++) {
             let nx = queue[i][0] + moves[j][0], ny = queue[i][1] + moves[j][1];
             if(nx >= 1 && nx <= n && ny >= 1 && ny <= m && vis[nx][ny] == 0) {
-                let fill = floodFill(nx, ny);
+                let fill = floodFill(nx, ny, cond);
                 let goOrb = ((acur < cur) || !(nx > 1 && nx < n && ny > 1 && ny < m));
                 if(fill > 0 && ((open[nx][ny] == 2 && goOrb) || (open[nx][ny] == 3 && !goOrb))) {
                     queue.push([nx, ny, i])
@@ -436,7 +436,7 @@ function bfs() {
     if(queue[i][1] == ay - 1) adir = 4;
     let nx = ax + targ[adir][0], ny = ay + targ[adir][1];
     let fill = 0;
-    if(nx >= 1 && nx <= n && ny >= 1 && ny <= m) fill = floodFill(nx, ny);
+    if(nx >= 1 && nx <= n && ny >= 1 && ny <= m) fill = floodFill(nx, ny, cond);
     if(queue.length == 1) return false;
     if(!(nx >= 1 && nx <= n && ny >= 1 && ny <= m) || fill < acur * 2) {
         let ma = -n * m, f = -1;
@@ -446,7 +446,7 @@ function bfs() {
             if(j + 1 == (adir + 1) % 4 + 1) continue;
             let nx = ax + moves[j][0], ny = ay + moves[j][1];
             if(!(nx >= 1 && nx <= n && ny >= 1 && ny <= m) || open[nx][ny] == 1) continue;
-            let cur = floodFill(nx, ny);
+            let cur = floodFill(nx, ny, cond);
             if(cur > ma) {
                 ma = cur;
                 f = j + 1;
