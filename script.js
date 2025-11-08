@@ -363,7 +363,9 @@ function checkTail(tx, ty) {
 function bfs() {
     if(ax == 1 || ax == n || ay == 1 || ay == m) {
         let ma = -1, f = -1;
-        for(j = 0; j < 4; j++) {
+        let start = Math.floor(Math.random() * 100);
+        for(let i = 0; i < 4; i++) {
+            let j = (i + start) % 4;
             if(j + 1 == (adir + 1) % 4 + 1) continue;
             let nx = ax + moves[j][0], ny = ay + moves[j][1];
             if(!(nx >= 1 && nx <= n && ny >= 1 && ny <= m) || open[nx][ny] == 1) continue;
@@ -374,7 +376,8 @@ function bfs() {
             }
         }
         if(f == -1) {
-            for(let j = 0; j < 4; j++) {
+            for(let i = 0; i < 4; i++) {
+                let j = (i + start) % 4;
                 let nx = ax + moves[j][0], ny = ay + moves[j][1];
                 if(!(nx >= 1 && nx <= n && ny >= 1 && ny <= m)) continue;
                 if(open[nx][ny] != 1) {
