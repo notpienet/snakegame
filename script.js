@@ -121,10 +121,14 @@ function resetGrid() {
 
 let targ = [0, [-1, 0], [0, 1], [1, 0], [0, -1]];
 function checkOpen(openNext) {
+    for(let i = 1; i <= n; i++) {
+        for(let j = 1; j <= m; j++) {
+            open[i][j] = 0;
+        }
+    }
     for(let i = 0; i < orb.length; i++) {
         open[orb[i][0]][orb[i][1]] = 2;
     }
-
     for(let i = 0; i < pos.length; i++) {
         if(pos[i][0] >= 1 && pos[i][0] <= n && pos[i][1] >= 1 && pos[i][1] <= m) {
             open[pos[i][0]][pos[i][1]] = 1;
@@ -137,7 +141,7 @@ function checkOpen(openNext) {
         }
     }
     let nx = x + targ[dir][0], ny = y + targ[dir][1];
-    if(openNext && nx >= 1 && nx <= n && ny >= 1 && ny <= m) open[nx][ny] = 1;
+    if(nx >= 1 && nx <= n && ny >= 1 && ny <= m) open[nx][ny] = 1;
     while(nx >= 1 && nx <= n && ny >= 1 && ny <= m) {
         if(open[nx][ny] == 0 || open[nx][ny] == 2) open[nx][ny] = 3;
         nx += targ[dir][0], ny += targ[dir][1];
@@ -277,9 +281,6 @@ function update() {
     checkOpen(true);
     if(playing == 1) {
         if(!bfs()) {
-            resetGrid();
-            drawOrb();
-            drawSnake();
             checkOpen(false);
             bfs();
         }
@@ -294,6 +295,7 @@ function update() {
 
 let moves = [[-1, 0], [0, 1], [1, 0], [0, -1]];
 function floodFill(tx, ty) {
+    checkOpen(false);
     let cx = x + targ[dir][0], cy = y + targ[dir][1];
     let temp = -1;
     if(cx >= 1 && cx <= n && cy >= 1 && cy <= m) {
@@ -327,6 +329,7 @@ function floodFill(tx, ty) {
 }
 
 function checkTail(tx, ty) {
+    checkOpen(false);
     let cx = apos[0][0], cy = apos[0][1];
     let temp = open[cx][cy];
     open[cx][cy] = 4;
