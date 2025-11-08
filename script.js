@@ -365,7 +365,7 @@ function checkTail(tx, ty, cond) {
 
 function bfs(cond) {
     if(ax == 1 || ax == n || ay == 1 || ay == m) {
-        let ma = -n * m, f = -1;
+        let ma = -n * m - 1, f = -1;
         let start = Math.floor(Math.random() * 100);
         for(let i = 0; i < 4; i++) {
             let j = (i + start) % 4;
@@ -439,7 +439,7 @@ function bfs(cond) {
     if(nx >= 1 && nx <= n && ny >= 1 && ny <= m) fill = floodFill(nx, ny, cond);
     if(queue.length == 1) return false;
     if(!(nx >= 1 && nx <= n && ny >= 1 && ny <= m) || fill < acur * 2) {
-        let ma = -n * m, f = -1;
+        let ma = -n * m - 1, f = -1;
         let start = Math.floor(Math.random() * 100);
         for(let i = 0; i < 4; i++) {
             let j = (i + start) % 4;
