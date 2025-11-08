@@ -322,7 +322,7 @@ function floodFill(tx, ty) {
         i++;
     }
     if(temp != -1) open[cx][cy] = temp;
-    if(!checkTail(tx, ty)) return 0;
+    if(!checkTail(tx, ty)) return queue.length - (n * m);
     return queue.length;
 }
 
@@ -362,7 +362,7 @@ function checkTail(tx, ty) {
 
 function bfs() {
     if(ax == 1 || ax == n || ay == 1 || ay == m) {
-        let ma = -1, f = -1;
+        let ma = -n * m, f = -1;
         let start = Math.floor(Math.random() * 100);
         for(let i = 0; i < 4; i++) {
             let j = (i + start) % 4;
@@ -408,7 +408,7 @@ function bfs() {
             if(nx >= 1 && nx <= n && ny >= 1 && ny <= m && vis[nx][ny] == 0) {
                 let fill = floodFill(nx, ny);
                 let goOrb = ((acur <= cur) || !(nx > 1 && nx < n && ny > 1 && ny < m));
-                if(fill != 0 && ((open[nx][ny] == 2 && goOrb) || (open[nx][ny] == 3 && !goOrb))) {
+                if(fill > 0 && ((open[nx][ny] == 2 && goOrb) || (open[nx][ny] == 3 && !goOrb))) {
                     queue.push([nx, ny, i])
                     i = queue.length - 1;
                     f = 1;
@@ -445,7 +445,7 @@ function bfs() {
                 return true;
             }
         }
-        let ma = -1, f = -1;
+        let ma = -n * m, f = -1;
         for(j = 0; j < 4; j++) {
             if(j + 1 == (adir + 1) % 4 + 1) continue;
             nx = ax + moves[j][0], ny = ay + moves[j][1];
