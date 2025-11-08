@@ -236,35 +236,35 @@ function checkHit() {
     let w = 0;
     if(x < 1 || x > n || y < 1 || y > m) {
         w = 2;
-        console.log("Player went outside the map");
+        console.log("Computer wins! Player went outside the map");
     }
     else if(ax < 1 || ax > n || ay < 1 || ay > m) {
         w = 1;
-        console.log("Computer went outside the map");
+        console.log("Player wins! Computer went outside the map");
     }
     else {
-        if(x == ax && y == ay) { //dua2ny mati
+        if(x == ax && y == ay) {
             w = 3;
-            console.log("Bump");
+            console.log("Draw! Player and computer bumped");
         }
         for(let i = 0; i + 1 < pos.length; i++) {
-            if(pos[i][0] == x && pos[i][1] == y) { //p1 tabrak diri sendiri
+            if(pos[i][0] == x && pos[i][1] == y) {
                 w = 2;
-                console.log("Player hit themselves");
+                console.log("Computer wins! Player hit themselves");
             }
-            if(pos[i][0] == ax && pos[i][1] == ay) { //p2 tabrak p1
+            if(pos[i][0] == ax && pos[i][1] == ay) {
                 w = 1;
-                console.log("Computer hit player");
+                console.log("Player wins! Computer hit player");
             }
         }
         for(let i = 0; i + 1 < apos.length; i++) {
-            if(apos[i][0] == x && apos[i][1] == y) { //p1 tabrak p2
+            if(apos[i][0] == x && apos[i][1] == y) {
                 w = 2;
-                console.log("Player hit computer");
+                console.log("Computer wins! Player hit computer");
             }
-            if(apos[i][0] == ax && apos[i][1] == ay) { //p2 tabrak diri sendiri
+            if(apos[i][0] == ax && apos[i][1] == ay) {
                 w = 1;
-                console.log("Computer hit themselves");
+                console.log("Player wins! Computer hit themselves");
             }
         }
     }
@@ -299,6 +299,38 @@ function update() {
 
 
 let moves = [[-1, 0], [0, 1], [1, 0], [0, -1]];
+function floodFill(tx, ty) {
+    let cx = x + targ[dir][0], cy = x + targ[dir][0];
+    let temp = -1;
+    if(cx >= 1 && cx <= n && cy >= 1 && cy <= m) {
+        temp = open[x + targ[dir][0]][y + targ[dir][1]];
+        open[x + targ[dir][0]][y + targ[dir][1]] = 1;
+    }
+    let i = 0;
+    let queue = [[tx, ty]];
+    let vis = [];
+    for(let j = 0; j <= n; j++) {
+        let temp = [];
+        for(let k = 0; k <= m; k++) {
+            temp.push(0);
+        }
+        vis.push(temp);
+    }
+    vis[tx][ty] = 1;
+    while(i < queue.length) {   
+        for(let j = 0; j < 4; j++) {
+            let nx = queue[i][0] + moves[j][0], ny = queue[i][1] + moves[j][1];
+            if(nx >= 1 && nx <= n && ny >= 1 && ny <= m && vis[nx][ny] == 0 && open[nx][ny] != 1) {
+                vis[nx][ny] = 1;
+                queue.push([nx, ny])
+            }
+        }
+        i++;
+    }
+    if(temp != -1) open[x + targ[dir][0]][y + targ[dir][1]] = temp;
+    return queue.length;
+}
+
 
 function bfs() {
     let i = 0;
@@ -318,7 +350,8 @@ function bfs() {
         for(let j = 0; j < 4; j++) {
             let nx = queue[i][0] + moves[j][0], ny = queue[i][1] + moves[j][1];
             if(nx >= 1 && nx <= n && ny >= 1 && ny <= m && vis[nx][ny] == 0) {
-                let goOrb = (acur <= cur) || !(nx > 1 && nx < n && ny > 1 && ny < m);
+                let fill = floodFill(nx, ny);
+                let goOrb = ((acur <= cur) || !(nx > 1 && nx < n && ny > 1 && ny < m)) && (fill >= acur * 2);
                 if((open[nx][ny] == 2 && goOrb) || (open[nx][ny] == 3 && !goOrb)) {
                     queue.push([nx, ny, i])
                     i = queue.length - 1;
@@ -350,7 +383,10 @@ function bfs() {
         else if(dir == 2 && ay - 1 >= 1 && open[ax][ay - 1] != 1 && alast != 2) adir = 4;
         if(adir != temp) return true;
     }
-    if(queue.length == 1) return false;
+    let nx = ax + targ[adir][0], ny = ay + targ[adir][1];
+    if(!(nx >= 1 && nx <= n && ny >= 1 && ny <= m)) return false;
+    let fill = floodFill(nx, ny);
+    if(queue.length == 1 || fill < acur * 2) return false;
     return true;
 }
 
@@ -361,17 +397,12 @@ document.addEventListener('keydown', function(event) {
     if(press == "d" || press == "arrowright") cand = 2;
     if(press == "s" || press == "arrowdown") cand = 3;
     if(press == "a" || press == "arrowleft") cand = 4;
-    // if(press == "arrowup") acand = 1;
-    // if(press == "arrowright") acand = 2;
-    // if(press == "arrowdown") acand = 3;
-    // if(press == "arrowleft") acand = 4;
     if(cand != -1 && playing == 0) {
         playing = 1;
         interval = setInterval(update, cd);
     }
     if(press == " ") reset();
     if(cand != (last + 1) % 4 + 1 && cand != -1 && cand != dir) dir = cand;
-    // if(acand != (alast + 1) % 4 + 1 && acand != -1 && acand != adir) adir = acand;
 });
 
 init();
