@@ -407,7 +407,7 @@ function bfs() {
             let nx = queue[i][0] + moves[j][0], ny = queue[i][1] + moves[j][1];
             if(nx >= 1 && nx <= n && ny >= 1 && ny <= m && vis[nx][ny] == 0) {
                 let fill = floodFill(nx, ny);
-                let goOrb = ((acur <= cur) || !(nx > 1 && nx < n && ny > 1 && ny < m));
+                let goOrb = ((acur < cur) || !(nx > 1 && nx < n && ny > 1 && ny < m));
                 if(fill > 0 && ((open[nx][ny] == 2 && goOrb) || (open[nx][ny] == 3 && !goOrb))) {
                     queue.push([nx, ny, i])
                     i = queue.length - 1;
