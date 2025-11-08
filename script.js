@@ -141,7 +141,6 @@ function checkOpen(openNext) {
         }
     }
     let nx = x + targ[dir][0], ny = y + targ[dir][1];
-    if(nx >= 1 && nx <= n && ny >= 1 && ny <= m) open[nx][ny] = 1;
     while(nx >= 1 && nx <= n && ny >= 1 && ny <= m) {
         if(open[nx][ny] == 0 || open[nx][ny] == 2) open[nx][ny] = 3;
         nx += targ[dir][0], ny += targ[dir][1];
