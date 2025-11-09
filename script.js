@@ -30,6 +30,7 @@ let acur;
 function reset() {
     clearInterval(interval);
     playing = 0;
+    orb = [];
 
     pos = [[Math.ceil(n / 2) + init_pos[0], Math.ceil(m / 2) + init_pos[1]]];
     x = pos[0][0], y = pos[0][1];
