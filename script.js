@@ -435,7 +435,7 @@ function bfs(cond) {
             if(nx >= 1 && nx <= n && ny >= 1 && ny <= m && vis[nx][ny] == 0) {
                 let fill = floodFill(nx, ny, cond);
                 let goOrb = ((acur < cur) || !(nx > 1 && nx < n && ny > 1 && ny < m));
-                if(fill > 0 && ((open[nx][ny] == 2 && goOrb) || (open[nx][ny] == 3 && !goOrb))) {
+                if(fill > acur * 2 && ((open[nx][ny] == 2 && goOrb) || (open[nx][ny] == 3 && !goOrb))) {
                     queue.push([nx, ny, i])
                     i = queue.length - 1;
                     f = 1;
