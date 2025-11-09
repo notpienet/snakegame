@@ -506,7 +506,7 @@ document.addEventListener('keydown', function(event) {
         interval = setInterval(update, cd);
         document.getElementById("ins").textContent = " ";
     }
-    if(press == " ") reset();
+    if(press == " " && playing == 1) reset();
     if(cand != (last + 1) % 4 + 1 && cand != -1 && cand != dir) dir = cand;
 });
 
