@@ -11,6 +11,7 @@
 
 .row {
     display: flex;
+    flex-wrap: nowrap;
 }
 
 body {
@@ -21,7 +22,7 @@ body {
 }
 
 h1 {
-    font-size: 42px;
+    font-size: 63px;
     font-weight: 700;
     margin: 0px;
     background: -webkit-linear-gradient(right, #5971dd, #be444e);
@@ -29,17 +30,21 @@ h1 {
     background-clip: text;
     -webkit-text-fill-color: transparent;
     font-family: "Oxanium", sans-serif;
-    margin-top: 15px;
+    padding-top: 6px;
+    margin-bottom: 0px;
 }
 
 p {
     margin: 0px;
+    font-size: 20px;
 }
 
 #top {
+    text-align: right;
     display: flex;
     align-items: center;
     z-index: 10;
+    margin-top: 15px;
 }
 
 #ver {
@@ -49,8 +54,8 @@ p {
 }
 
 #icon {
-    width: 40px;
-    height: 40px;
+    width: 60px;
+    height: 60px;
 }
 
 #stats {

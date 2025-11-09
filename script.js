@@ -42,21 +42,25 @@ function reset() {
     acur = init_cur;
     
     for(let i = 1; i + 1 < acur; i++) move();
+    document.getElementById("ins").textContent = "Use WASD / Arrow Keys to start Moving";
     update();
 }
 
 function init() {
-    for(let i = 1; i <= n; i++) {
+    for(let i = 0; i <= n + 1; i++) {
         const row = document.createElement("div");
         row.setAttribute("class", "row");
         const temp = [0];
-        for(let j = 1; j <= m; j++) {
+        for(let j = 0; j <= m + 1; j++) {
             const grid = document.createElement("div");
             grid.setAttribute("class", "grid");
             grid.setAttribute("id", i + "_" + j);
             let b = (1 - Math.abs(n / 2 - i) / n) * (1 - Math.abs(m / 2 - j) / n) * 1;
-            if((i + j) % 2 == 0) grid.style.backgroundColor = "rgb(" + g1 * b + ", " + g1 * b + ", " + g1 * b + ")";
-            else grid.style.backgroundColor = "rgb(" + g2 * b + ", " + g2 * b + ", " + g2 * b + ")";
+            if(i >= 1 && i <= n && j >= 1 && j <= m) {
+                if((i + j) % 2 == 0) grid.style.backgroundColor = "rgb(" + g1 * b + ", " + g1 * b + ", " + g1 * b + ")";
+                else grid.style.backgroundColor = "rgb(" + g2 * b + ", " + g2 * b + ", " + g2 * b + ")";
+            }
+            else grid.style.backgroundColor = "rgb(0, 0, 0)";
             const img = document.createElement("img");
             img.setAttribute("class", "gimg");
             img.setAttribute("id", i + "." + j);
@@ -84,7 +88,8 @@ function spawnOrb() {
 
 function die() {
     clearInterval(interval);
-    document.getElementById("stats").innerHTML = "won " + wins + " out of " + games + " games (" + Math.round(10000 * wins / games) / 100 + "%)";
+    document.getElementById("ins").textContent = "Press the spacebar to reset";
+    document.getElementById("stats").innerHTML = win + "W / " + draw + "D / " + lose + "L (" + (Math.round((10000 * (win + 0.5 * draw)) / games) / 100).toFixed(2) + "%)";
 }
 
 function move() {
@@ -110,11 +115,18 @@ function move() {
 }
 
 function resetGrid() {
-    for(let i = 1; i <= n; i++) {
-        for(let j = 1; j <= m; j++) {
-            const img = document.getElementById(i + "." + j);
+    for(let i = 0; i <= n + 1; i++) {
+        for(let j = 0; j <= m + 1; j++) {
+            let img = document.getElementById(i + "." + j);
             img.src = empty_sprite;
             open[i][j] = 0;
+            let grid = document.getElementById(i + "_" + j);
+            if(i >= 1 && i <= n && j >= 1 && j <= m) {
+                let b = (1 - Math.abs(n / 2 - i) / n) * (1 - Math.abs(m / 2 - j) / n) * 1;
+                if((i + j) % 2 == 0) grid.style.backgroundColor = "rgb(" + g1 * b + ", " + g1 * b + ", " + g1 * b + ")";
+                else grid.style.backgroundColor = "rgb(" + g2 * b + ", " + g2 * b + ", " + g2 * b + ")";
+            }
+            else grid.style.backgroundColor = "rgb(0, 0, 0)";
         }
     }
 }
@@ -228,10 +240,19 @@ function drawSnake() {
     }
 }
 
-let wins = 0, games = 0;
+let win = 0, draw = 0, lose = 0, games = 0;
 function checkHit() {
     if(pos.length > cur) pos.shift();
     if(apos.length > acur) apos.shift();
+    let grid = document.getElementById(x + "_" + y);
+    let agrid = document.getElementById(ax + "_" + ay);
+    let b = (1 - Math.abs(n / 2 - x) / n) * (1 - Math.abs(m / 2 - y) / n) * 1;
+    let ab = (1 - Math.abs(n / 2 - ax) / n) * (1 - Math.abs(m / 2 - ay) / n) * 1;
+    if(grid == agrid) grid.style.backgroundColor = "rgb(" + b * 156 + ", " + b * 100 + ", " + b * 158 + ")";
+    else {
+        grid.style.backgroundColor = "rgb(" + b * 89 + ", " + b * 113 + ", " + b * 221 + ")";
+        agrid.style.backgroundColor = "rgb(" + ab * 222 + ", " + ab * 86 + ", " + ab * 95 + ")";
+    }
     let w = 0;
     if(x < 1 || x > n || y < 1 || y > m) {
         w = 2;
@@ -268,7 +289,9 @@ function checkHit() {
         }
     }
     if(w !== 0) {
-        if(w == 1) wins++;
+        if(w == 1) win++;
+        else if(w == 2) lose++;
+        else draw++;
         games++;
         die();
         return false;
@@ -480,6 +503,7 @@ document.addEventListener('keydown', function(event) {
     if(cand != -1 && playing == 0) {
         playing = 1;
         interval = setInterval(update, cd);
+        document.getElementById("ins").textContent = " ";
     }
     if(press == " ") reset();
     if(cand != (last + 1) % 4 + 1 && cand != -1 && cand != dir) dir = cand;
