@@ -303,7 +303,7 @@ function checkHit() {
 function update() {
     checkOrb();
     checkOpen(true);
-    if(playing == 1) {
+    if(playing == 1 && mode == 1) {
         if(!bfs(true)) {
             checkOpen(false);
             bfs(false);
@@ -494,20 +494,45 @@ function bfs(cond) {
     return true;
 }
 
+let mode = 1;
+
 document.addEventListener('keydown', function(event) {
     let press = event.key.toLowerCase();
     let cand = -1, acand = -1;
-    if(press == "w" || press == "arrowup") cand = 1;
-    if(press == "d" || press == "arrowright") cand = 2;
-    if(press == "s" || press == "arrowdown") cand = 3;
-    if(press == "a" || press == "arrowleft") cand = 4;
-    if(cand != -1 && playing == 0) {
+    if(mode == 1) {
+        if(press == "w" || press == "arrowup") cand = 1;
+        if(press == "d" || press == "arrowright") cand = 2;
+        if(press == "s" || press == "arrowdown") cand = 3;
+        if(press == "a" || press == "arrowleft") cand = 4;
+    }
+    else {
+        if(press == "w") cand = 1;
+        if(press == "d") cand = 2;
+        if(press == "s") cand = 3;
+        if(press == "a") cand = 4;
+        if(press == "arrowup") acand = 1;
+        if(press == "arrowright") acand = 2;
+        if(press == "arrowdown") acand = 3;
+        if(press == "arrowleft") acand = 4;
+    }
+    if((cand != -1 || acand != -1) && playing == 0) {
         playing = 1;
         interval = setInterval(update, cd);
-        document.getElementById("ins").textContent = " ";
+        document.getElementById("ins").textContent = "";
     }
     if(press == " " && playing == 1) reset();
     if(cand != (last + 1) % 4 + 1 && cand != -1 && cand != dir) dir = cand;
+    if(acand != (alast + 1) % 4 + 1 && acand != -1 && acand != adir) adir = acand;
+    if(press == "p" && document.getElementById("ins").textContent != "") {
+        if(mode == 1) {
+            mode = 2;
+            document.getElementById("mode").textContent = "2 Player Mode";
+        }
+        else {
+            mode = 1;
+            document.getElementById("mode").textContent = "Computer Mode";
+        }
+    }
 });
 
 init();
