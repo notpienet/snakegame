@@ -197,7 +197,7 @@ function checkOrb() {
 function drawOrb() {
     for(let i = 0; i < orb.length; i++) {
         const img = document.getElementById(orb[i][0] + "." + orb[i][1]);
-        img.src = orb_sprite;
+        if(!img.src.endsWith(orb_sprite)) img.src = orb_sprite;
         img.style.filter = "brightness(1)";
         img.style.opacity = "100%";
     }
@@ -213,7 +213,8 @@ function drawSnake() {
         if(pos[i][0] >= 1 && pos[i][0] <= n && pos[i][1] >= 1 && pos[i][1] <= m) {
             open[pos[i][0]][pos[i][1]] = 1;
             const img = document.getElementById(pos[i][0] + "." + pos[i][1]);
-            img.src = "assets/" + Math.min(a, b) + Math.max(a, b) + ".svg";
+            let newimage = "assets/" + Math.min(a, b) + Math.max(a, b) + ".svg";
+            if(!img.src.endsWith(newimage)) img.src = newimage;
             img.style.opacity = "100%";
             const fade = Math.min(1, pos.length * 0.1) * i / (pos.length - 1);
             img.style.filter = "brightness(" + (Math.max(0.5, 1 - pos.length * 0.05) + fade * 0.5) + ") hue-rotate(0deg)";
@@ -222,7 +223,8 @@ function drawSnake() {
     }
     if(x >= 1 && x <= n && y >= 1 && y <= m) {
         const temp = document.getElementById(x + "." + y);
-        temp.src = "assets/0" + a + ".svg";
+        let newimage = "assets/0" + a + ".svg";
+        if(!temp.src.endsWith(newimage)) temp.src = newimage;
         temp.style.opacity = "100%";
         temp.style.filter = "brightness(1) hue-rotate(0deg)";
     }
@@ -237,7 +239,8 @@ function drawSnake() {
         if(apos[i][0] >= 1 && apos[i][0] <= n && apos[i][1] >= 1 && apos[i][1] <= m) {
             open[apos[i][0]][apos[i][1]] = 1;
             const img = document.getElementById(apos[i][0] + "." + apos[i][1]);
-            img.src = "assets/" + Math.min(a, b) + Math.max(a, b) + ".svg";
+            let newimage = "assets/" + Math.min(a, b) + Math.max(a, b) + ".svg";
+            if(!img.src.endsWith(newimage)) img.src = newimage;
             img.style.opacity = "100%";
             const fade = Math.min(1, apos.length * 0.1) * i / (apos.length - 1);
             img.style.filter = "brightness(" + (Math.max(0.5, 1 - apos.length * 0.05) + fade * 0.5) + ") hue-rotate(" + rot + "deg)";
@@ -246,7 +249,8 @@ function drawSnake() {
     }
     if(ax >= 1 && ax <= n && ay >= 1 && ay <= m) {
         const temp = document.getElementById(ax + "." + ay);
-        temp.src = "assets/0" + a + ".svg";
+        let newimage = "assets/0" + a + ".svg";
+        if(!temp.src.endsWith(newimage)) temp.src = newimage;
         temp.style.opacity = "100%";
         temp.style.filter = "brightness(1) hue-rotate(" + rot + "deg)";
     }
@@ -270,34 +274,32 @@ function checkHit() {
         w = 2;
         console.log("Computer wins! Player went outside the map");
     }
-    else if(ax < 1 || ax > n || ay < 1 || ay > m) {
-        w = 1;
+    if(ax < 1 || ax > n || ay < 1 || ay > m) {
+        w = (w == 0 || w == 1) ? 1 : 3;
         console.log("Player wins! Computer went outside the map");
     }
-    else {
-        if(x == ax && y == ay) {
-            w = 3;
-            console.log("Draw! Player and computer bumped");
+    if(x == ax && y == ay) {
+        w = 3;
+        console.log("Draw! Player and computer bumped");
+    }
+    for(let i = 0; i + 1 < pos.length; i++) {
+        if(pos[i][0] == x && pos[i][1] == y) {
+            w = (w == 0 || w == 2) ? 2 : 3;
+            console.log("Computer wins! Player hit themselves");
         }
-        for(let i = 0; i + 1 < pos.length; i++) {
-            if(pos[i][0] == x && pos[i][1] == y) {
-                w = 2;
-                console.log("Computer wins! Player hit themselves");
-            }
-            if(pos[i][0] == ax && pos[i][1] == ay) {
-                w = 1;
-                console.log("Player wins! Computer hit player");
-            }
+        if(pos[i][0] == ax && pos[i][1] == ay) {
+            w = (w == 0 || w == 1) ? 1 : 3;
+            console.log("Player wins! Computer hit player");
         }
-        for(let i = 0; i + 1 < apos.length; i++) {
-            if(apos[i][0] == x && apos[i][1] == y) {
-                w = 2;
-                console.log("Computer wins! Player hit computer");
-            }
-            if(apos[i][0] == ax && apos[i][1] == ay) {
-                w = 1;
-                console.log("Player wins! Computer hit themselves");
-            }
+    }
+    for(let i = 0; i + 1 < apos.length; i++) {
+        if(apos[i][0] == x && apos[i][1] == y) {
+            w = (w == 0 || w == 2) ? 2 : 3;
+            console.log("Computer wins! Player hit computer");
+        }
+        if(apos[i][0] == ax && apos[i][1] == ay) {
+            w = (w == 0 || w == 1) ? 1 : 3;
+            console.log("Player wins! Computer hit themselves");
         }
     }
     if(w !== 0) {
