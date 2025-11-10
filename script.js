@@ -1,5 +1,5 @@
-const orb_sprite = "assets/orb.png";
-const empty_sprite = "assets/-.png";
+const orb_sprite = "assets/orb.svg";
+const empty_sprite = "assets/-.svg";
 const game = document.getElementById("game");
 const g1 = 95, g2 = 58;
 
@@ -42,6 +42,9 @@ function reset() {
     adir = init_adir, alast = adir;
     acur = init_cur;
     
+    buffer = [];
+    abuffer = [];
+
     for(let i = 1; i + 1 < acur; i++) move();
     document.getElementById("ins").textContent = "Use WASD / Arrow Keys to start Moving";
     update();
@@ -122,7 +125,7 @@ function resetGrid() {
     for(let i = 0; i <= n + 1; i++) {
         for(let j = 0; j <= m + 1; j++) {
             let img = document.getElementById(i + "." + j);
-            img.src = empty_sprite;
+            img.style.opacity = "0%";
             open[i][j] = 0;
             let grid = document.getElementById(i + "_" + j);
             if(i >= 1 && i <= n && j >= 1 && j <= m) {
@@ -196,6 +199,7 @@ function drawOrb() {
         const img = document.getElementById(orb[i][0] + "." + orb[i][1]);
         img.src = orb_sprite;
         img.style.filter = "brightness(1)";
+        img.style.opacity = "100%";
     }
 }
 
@@ -209,7 +213,8 @@ function drawSnake() {
         if(pos[i][0] >= 1 && pos[i][0] <= n && pos[i][1] >= 1 && pos[i][1] <= m) {
             open[pos[i][0]][pos[i][1]] = 1;
             const img = document.getElementById(pos[i][0] + "." + pos[i][1]);
-            img.src = "assets/" + Math.min(a, b) + Math.max(a, b) + ".png";
+            img.src = "assets/" + Math.min(a, b) + Math.max(a, b) + ".svg";
+            img.style.opacity = "100%";
             const fade = Math.min(1, pos.length * 0.1) * i / (pos.length - 1);
             img.style.filter = "brightness(" + (Math.max(0.5, 1 - pos.length * 0.05) + fade * 0.5) + ") hue-rotate(0deg)";
         }
@@ -217,7 +222,8 @@ function drawSnake() {
     }
     if(x >= 1 && x <= n && y >= 1 && y <= m) {
         const temp = document.getElementById(x + "." + y);
-        temp.src = "assets/0" + a + ".png";
+        temp.src = "assets/0" + a + ".svg";
+        temp.style.opacity = "100%";
         temp.style.filter = "brightness(1) hue-rotate(0deg)";
     }
 
@@ -231,7 +237,8 @@ function drawSnake() {
         if(apos[i][0] >= 1 && apos[i][0] <= n && apos[i][1] >= 1 && apos[i][1] <= m) {
             open[apos[i][0]][apos[i][1]] = 1;
             const img = document.getElementById(apos[i][0] + "." + apos[i][1]);
-            img.src = "assets/" + Math.min(a, b) + Math.max(a, b) + ".png";
+            img.src = "assets/" + Math.min(a, b) + Math.max(a, b) + ".svg";
+            img.style.opacity = "100%";
             const fade = Math.min(1, apos.length * 0.1) * i / (apos.length - 1);
             img.style.filter = "brightness(" + (Math.max(0.5, 1 - apos.length * 0.05) + fade * 0.5) + ") hue-rotate(" + rot + "deg)";
         }
@@ -239,7 +246,8 @@ function drawSnake() {
     }
     if(ax >= 1 && ax <= n && ay >= 1 && ay <= m) {
         const temp = document.getElementById(ax + "." + ay);
-        temp.src = "assets/0" + a + ".png";
+        temp.src = "assets/0" + a + ".svg";
+        temp.style.opacity = "100%";
         temp.style.filter = "brightness(1) hue-rotate(" + rot + "deg)";
     }
 }
