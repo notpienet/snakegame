@@ -1,6 +1,6 @@
 .grid {
-    width: 40px;
-    height: 40px;
+    width: min(4vw, 4vh);
+    height: min(4vw, 4vh);
     background-size: cover;
     background-position: center;
 }
@@ -19,10 +19,12 @@ body {
     color: white;
     font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
     margin-left: 20px;
+    padding: 10px;
+    margin: 0px;
 }
 
 h1 {
-    font-size: 63px;
+    font-size: 40px;
     font-weight: 700;
     margin: 0px;
     background: -webkit-linear-gradient(right, #5971dd, #be444e);
@@ -30,21 +32,20 @@ h1 {
     background-clip: text;
     -webkit-text-fill-color: transparent;
     font-family: "Oxanium", sans-serif;
-    padding-top: 6px;
     margin-bottom: 0px;
 }
 
 p {
     margin: 0px;
-    font-size: 20px;
+    font-size: min(3vw, 2vh);
 }
 
 #top {
-    text-align: right;
     display: flex;
-    align-items: center;
+    align-items: flex-end;
     z-index: 10;
-    margin-top: 15px;
+    margin: 0px;
+    margin-top: 3px;
 }
 
 #ver {
@@ -54,15 +55,13 @@ p {
 }
 
 #icon {
-    width: 60px;
-    height: 60px;
+    width: 40px;
+    height: 40px;
+    margin-bottom: 12px;
 }
 
 #mode {
-    position: absolute;
-    right: 10px;
-    top: 10px;
-    font-size: 25px;
+    font-size: min(4vw, 3vh);
 }
 
 #stats {
@@ -71,11 +70,15 @@ p {
     bottom: 10px;
 }
 
-#change {
+#topright {
     position: absolute;
     right: 10px;
-    top: 40px;
-    font-size: 16px;
+    top: 10px;
+    text-align: right;
+}
+
+#change {
+    font-size: min(2.5vw, 1.5vh);
 }
 
 #game {

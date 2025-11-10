@@ -89,6 +89,8 @@ function spawnOrb() {
 
 function die() {
     clearInterval(interval);
+    buffer = [];
+    abuffer = [];
     document.getElementById("ins").textContent = "Press the spacebar to reset";
     document.getElementById("change").textContent = "Press P to change modes";
     document.getElementById("stats").innerHTML = win + "W / " + draw + "D / " + lose + "L (" + (Math.round((10000 * (win + 0.5 * draw)) / games) / 100).toFixed(2) + "%)";
