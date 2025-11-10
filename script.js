@@ -90,6 +90,7 @@ function spawnOrb() {
 function die() {
     clearInterval(interval);
     document.getElementById("ins").textContent = "Press the spacebar to reset";
+    document.getElementById("change").textContent = "Press P to change modes";
     document.getElementById("stats").innerHTML = win + "W / " + draw + "D / " + lose + "L (" + (Math.round((10000 * (win + 0.5 * draw)) / games) / 100).toFixed(2) + "%)";
 }
 
@@ -521,6 +522,7 @@ document.addEventListener('keydown', function(event) {
         playing = 1;
         interval = setInterval(update, cd);
         document.getElementById("ins").textContent = "";
+        document.getElementById("change").textContent = "";
     }
     if(press == " " && playing == 1) reset();
     if(cand != (last + 1) % 4 + 1 && cand != -1 && cand != dir) dir = cand;
