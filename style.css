@@ -62,12 +62,20 @@ p {
     position: absolute;
     right: 10px;
     top: 10px;
+    font-size: 25px;
 }
 
 #stats {
     position: absolute;
     left: 10px;
     bottom: 10px;
+}
+
+#change {
+    position: absolute;
+    right: 10px;
+    top: 40px;
+    font-size: 16px;
 }
 
 #game {

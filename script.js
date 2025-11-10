@@ -290,10 +290,12 @@ function checkHit() {
         }
     }
     if(w !== 0) {
-        if(w == 1) win++;
-        else if(w == 2) lose++;
-        else draw++;
-        games++;
+        if(mode == 1) {
+            if(w == 1) win++;
+            else if(w == 2) lose++;
+            else draw++;
+            games++;
+        }
         die();
         return false;
     }
