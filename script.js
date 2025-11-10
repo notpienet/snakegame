@@ -304,6 +304,7 @@ function checkHit() {
 }
 
 function update() {
+    checkBuffer();
     checkOrb();
     checkOpen(true);
     if(playing == 1 && mode == 1) {
@@ -498,6 +499,20 @@ function bfs(cond) {
 }
 
 let mode = 1;
+let buffer = [], abuffer = [];
+
+function checkBuffer() {
+    if(buffer.length > 0) {
+        dir = buffer[0];
+        last = dir;
+        buffer.shift();
+    }
+    if(abuffer.length > 0) {
+        adir = abuffer[0];
+        alast = adir;
+        abuffer.shift();
+    }
+}
 
 document.addEventListener('keydown', function(event) {
     let press = event.key.toLowerCase();
@@ -525,8 +540,16 @@ document.addEventListener('keydown', function(event) {
         document.getElementById("change").textContent = "";
     }
     if(press == " " && playing == 1) reset();
-    if(cand != (last + 1) % 4 + 1 && cand != -1 && cand != dir) dir = cand;
-    if(acand != (alast + 1) % 4 + 1 && acand != -1 && acand != adir) adir = acand;
+    if(cand != -1) {
+        let templast = last;
+        if(buffer.length > 0) templast = buffer[buffer.length - 1];
+        if(cand != templast && cand != (templast + 1) % 4 + 1 && buffer.length < 2) buffer.push(cand);
+    }
+    if(acand != -1) {
+        let templast = alast;
+        if(abuffer.length > 0) templast = abuffer[abuffer.length - 1];
+        if(acand != templast && acand != (templast + 1) % 4 + 1 && abuffer.length < 2) abuffer.push(acand);
+    }
     if(press == "p" && document.getElementById("ins").textContent != "") {
         if(mode == 1) {
             mode = 2;
