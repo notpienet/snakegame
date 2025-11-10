@@ -529,10 +529,12 @@ document.addEventListener('keydown', function(event) {
         if(mode == 1) {
             mode = 2;
             document.getElementById("mode").textContent = "2 Player Mode";
+            document.getElementById("stats").style.opacity = "0%";
         }
         else {
             mode = 1;
             document.getElementById("mode").textContent = "Computer Mode";
+            document.getElementById("stats").style.opacity = "100%";
         }
     }
 });
