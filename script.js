@@ -1,5 +1,5 @@
-const orb_sprite = "assets/orb.png";
-const empty_sprite = "assets/-.png";
+const orb_sprite = "assets/orb.svg";
+const empty_sprite = "assets/-.svg";
 const game = document.getElementById("game");
 const g1 = 95, g2 = 58;
 
@@ -57,7 +57,7 @@ function preloadImage(link) {
 
 function init() {
     for(let i = 0; i <= 3; i++) {
-        preloadImage("assets/" + i + ".png");
+        preloadImage("assets/" + i + ".svg");
     }
     for(let i = 0; i <= n + 1; i++) {
         const row = document.createElement("div");
@@ -216,10 +216,10 @@ function drawOrb() {
 
 function getImg(a, b) {
     let diff = (Math.abs(a - b) - 1) % 2 + 1;
-    if(Math.min(a, b) == 0) return "assets/1.png";
-    if(diff == 1) return "assets/2.png";
-    if(diff == 2) return "assets/3.png";
-    return "assets/0.png";
+    if(Math.min(a, b) == 0) return "assets/1.svg";
+    if(diff == 1) return "assets/2.svg";
+    if(diff == 2) return "assets/3.svg";
+    return "assets/0.svg";
 }
 
 function getRot(a, b) {
