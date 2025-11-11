@@ -315,6 +315,16 @@ function checkHit() {
             else draw++;
             games++;
         }
+        else {
+            if(w == 1) score++;
+            else if(w == 2) ascore++;
+            else {
+                score++;
+                ascore++;
+            }
+            document.getElementById("leftscore").textContent = score;
+            document.getElementById("rightscore").textContent = ascore;
+        }
         die();
         return false;
     }
@@ -532,6 +542,8 @@ function checkBuffer() {
     }
 }
 
+let score = 0, ascore = 0;
+
 document.addEventListener('keydown', function(event) {
     let press = event.key.toLowerCase();
     let cand = -1, acand = -1;
@@ -573,12 +585,17 @@ document.addEventListener('keydown', function(event) {
             mode = 2;
             document.getElementById("mode").textContent = "2 Player Mode";
             document.getElementById("stats").style.opacity = "0%";
+            document.getElementById("leftscore").style.opacity = "100%";
+            document.getElementById("rightscore").style.opacity = "100%";
         }
         else {
             mode = 1;
             document.getElementById("mode").textContent = "Computer Mode";
             document.getElementById("stats").style.opacity = "100%";
+            document.getElementById("leftscore").style.opacity = "0%";
+            document.getElementById("rightscore").style.opacity = "0%";
         }
+        if(playing == 1) reset();
     }
 });
 

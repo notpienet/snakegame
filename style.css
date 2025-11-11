@@ -17,7 +17,7 @@
 body {
     background-color: black;
     color: white;
-    font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+    font-family: "Oxanium", sans-serif;
     margin-left: 20px;
     padding: 10px;
     margin: 0px;
@@ -31,7 +31,6 @@ h1 {
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
-    font-family: "Oxanium", sans-serif;
     margin-bottom: 0px;
 }
 
@@ -87,4 +86,24 @@ p {
     left: 50%;
     top: 50%;
     transform: translate(-50%, -50%);
+}
+
+#leftscore {
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #5971dd;
+    font-size: min(5vw, 5vh);
+    opacity: 0%;
+}
+
+#rightscore {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #be444e;
+    font-size: min(5vw, 5vh);
+    opacity: 0%;
 }
