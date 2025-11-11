@@ -153,10 +153,17 @@ function checkOpen(openNext) {
             open[pos[i][0]][pos[i][1]] = 1;
         }
     }
-    
     for(let i = 0; i < apos.length; i++) {
         if(apos[i][0] >= 1 && apos[i][0] <= n && apos[i][1] >= 1 && apos[i][1] <= m) {
             open[apos[i][0]][apos[i][1]] = 1;
+        }
+    }
+    if(openNext) {
+        for(let i = 1; i <= 4; i++) {
+            let nx = x + targ[i][0], ny = y + targ[i][1];
+            if(nx >= 1 && nx <= n && ny >= 1 && ny <= m) {
+                open[nx][ny] = 1;
+            }
         }
     }
     let nx = x + targ[last][0], ny = y + targ[last][1];
