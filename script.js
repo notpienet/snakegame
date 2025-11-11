@@ -1,5 +1,5 @@
-const orb_sprite = "assets/orb.svg";
-const empty_sprite = "assets/-.svg";
+const orb_sprite = "assets/orb.png";
+const empty_sprite = "assets/-.png";
 const game = document.getElementById("game");
 const g1 = 95, g2 = 58;
 
@@ -50,7 +50,15 @@ function reset() {
     update();
 }
 
+function preloadImage(link) {
+    const img = new Image();
+    img.src = link;
+}
+
 function init() {
+    for(let i = 0; i <= 3; i++) {
+        preloadImage("assets/" + i + ".png");
+    }
     for(let i = 0; i <= n + 1; i++) {
         const row = document.createElement("div");
         row.setAttribute("class", "row");
@@ -59,6 +67,9 @@ function init() {
             const grid = document.createElement("div");
             grid.setAttribute("class", "grid");
             grid.setAttribute("id", i + "_" + j);
+            let size = Math.floor(Math.min(window.innerWidth, window.innerHeight) * 0.04) + "px";
+            grid.style.height = size;
+            grid.style.width = size;
             let b = (1 - Math.abs(n / 2 - i) / n) * (1 - Math.abs(m / 2 - j) / n) * 1;
             if(i >= 1 && i <= n && j >= 1 && j <= m) {
                 if((i + j) % 2 == 0) grid.style.backgroundColor = "rgb(" + g1 * b + ", " + g1 * b + ", " + g1 * b + ")";
@@ -153,23 +164,17 @@ function checkOpen(openNext) {
             open[pos[i][0]][pos[i][1]] = 1;
         }
     }
+    
     for(let i = 0; i < apos.length; i++) {
         if(apos[i][0] >= 1 && apos[i][0] <= n && apos[i][1] >= 1 && apos[i][1] <= m) {
             open[apos[i][0]][apos[i][1]] = 1;
         }
     }
-    if(openNext) {
-        for(let i = 1; i <= 4; i++) {
-            let nx = x + targ[i][0], ny = y + targ[i][1];
-            if(nx >= 1 && nx <= n && ny >= 1 && ny <= m) {
-                open[nx][ny] = 1;
-            }
-        }
-    }
-    let nx = x + targ[last][0], ny = y + targ[last][1];
+    let nx = x + targ[dir][0], ny = y + targ[dir][1];
+    if(openNext && nx >= 1 && nx <= n && ny >= 1 && ny <= m) open[nx][ny] = 1;
     while(nx >= 1 && nx <= n && ny >= 1 && ny <= m) {
         if(open[nx][ny] == 0 || open[nx][ny] == 2) open[nx][ny] = 3;
-        nx += targ[last][0], ny += targ[last][1];
+        nx += targ[dir][0], ny += targ[dir][1];
     }
     if(!openNext) return;
 }
@@ -209,6 +214,21 @@ function drawOrb() {
     }
 }
 
+function getImg(a, b) {
+    let diff = (Math.abs(a - b) - 1) % 2 + 1;
+    if(Math.min(a, b) == 0) return "assets/1.png";
+    if(diff == 1) return "assets/2.png";
+    if(diff == 2) return "assets/3.png";
+    return "assets/0.png";
+}
+
+function getRot(a, b) {
+    if(Math.min(a, b) == 0) return ((Math.max(a, b) - 1) * 90) + "deg";
+    let diff = (Math.abs(a - b) - 1) % 2 + 1;
+    if(diff == 1 && Math.max(a, b) == 4 && Math.min(a, b) == 1) return "270deg";
+    else return ((Math.min(a, b) - 1) * 90) + "deg";
+}
+
 function drawSnake() {
     let a = 0, b = 0;
     for(let i = 0; i + 1 < pos.length; i++) {
@@ -219,18 +239,19 @@ function drawSnake() {
         if(pos[i][0] >= 1 && pos[i][0] <= n && pos[i][1] >= 1 && pos[i][1] <= m) {
             open[pos[i][0]][pos[i][1]] = 1;
             const img = document.getElementById(pos[i][0] + "." + pos[i][1]);
-            let newimage = "assets/" + Math.min(a, b) + Math.max(a, b) + ".svg";
-            if(!img.src.endsWith(newimage)) img.src = newimage;
+            if(!img.src.endsWith(getImg(a, b))) img.src = getImg(a, b);
+            img.style.transform = "rotate(" + getRot(a, b) + ")";
             img.style.opacity = "100%";
             const fade = Math.min(1, pos.length * 0.1) * i / (pos.length - 1);
             img.style.filter = "brightness(" + (Math.max(0.5, 1 - pos.length * 0.05) + fade * 0.5) + ") hue-rotate(0deg)";
         }
         a = ((b + 1) % 4 + 1);
     }
+    b = 0;
     if(x >= 1 && x <= n && y >= 1 && y <= m) {
         const temp = document.getElementById(x + "." + y);
-        let newimage = "assets/0" + a + ".svg";
-        if(!temp.src.endsWith(newimage)) temp.src = newimage;
+        if(!temp.src.endsWith(getImg(a, b))) temp.src = getImg(a, b);
+        temp.style.transform = "rotate(" + getRot(a, b) + ")";
         temp.style.opacity = "100%";
         temp.style.filter = "brightness(1) hue-rotate(0deg)";
     }
@@ -245,18 +266,19 @@ function drawSnake() {
         if(apos[i][0] >= 1 && apos[i][0] <= n && apos[i][1] >= 1 && apos[i][1] <= m) {
             open[apos[i][0]][apos[i][1]] = 1;
             const img = document.getElementById(apos[i][0] + "." + apos[i][1]);
-            let newimage = "assets/" + Math.min(a, b) + Math.max(a, b) + ".svg";
-            if(!img.src.endsWith(newimage)) img.src = newimage;
+            if(!img.src.endsWith(getImg(a, b))) img.src = getImg(a, b);
+            img.style.transform = "rotate(" + getRot(a, b) + ")";
             img.style.opacity = "100%";
             const fade = Math.min(1, apos.length * 0.1) * i / (apos.length - 1);
             img.style.filter = "brightness(" + (Math.max(0.5, 1 - apos.length * 0.05) + fade * 0.5) + ") hue-rotate(" + rot + "deg)";
         }
         a = ((b + 1) % 4 + 1);
     }
+    b = 0;
     if(ax >= 1 && ax <= n && ay >= 1 && ay <= m) {
         const temp = document.getElementById(ax + "." + ay);
-        let newimage = "assets/0" + a + ".svg";
-        if(!temp.src.endsWith(newimage)) temp.src = newimage;
+        if(!temp.src.endsWith(getImg(a, b))) temp.src = getImg(a, b);
+        temp.style.transform = "rotate(" + getRot(a, b) + ")";
         temp.style.opacity = "100%";
         temp.style.filter = "brightness(1) hue-rotate(" + rot + "deg)";
     }
@@ -314,16 +336,6 @@ function checkHit() {
             else if(w == 2) lose++;
             else draw++;
             games++;
-        }
-        else {
-            if(w == 1) score++;
-            else if(w == 2) ascore++;
-            else {
-                score++;
-                ascore++;
-            }
-            document.getElementById("leftscore").textContent = score;
-            document.getElementById("rightscore").textContent = ascore;
         }
         die();
         return false;
@@ -542,8 +554,6 @@ function checkBuffer() {
     }
 }
 
-let score = 0, ascore = 0;
-
 document.addEventListener('keydown', function(event) {
     let press = event.key.toLowerCase();
     let cand = -1, acand = -1;
@@ -585,17 +595,12 @@ document.addEventListener('keydown', function(event) {
             mode = 2;
             document.getElementById("mode").textContent = "2 Player Mode";
             document.getElementById("stats").style.opacity = "0%";
-            document.getElementById("leftscore").style.opacity = "100%";
-            document.getElementById("rightscore").style.opacity = "100%";
         }
         else {
             mode = 1;
             document.getElementById("mode").textContent = "Computer Mode";
             document.getElementById("stats").style.opacity = "100%";
-            document.getElementById("leftscore").style.opacity = "0%";
-            document.getElementById("rightscore").style.opacity = "0%";
         }
-        if(playing == 1) reset();
     }
 });
 
