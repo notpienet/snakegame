@@ -159,11 +159,10 @@ function checkOpen(openNext) {
             open[apos[i][0]][apos[i][1]] = 1;
         }
     }
-    let nx = x + targ[dir][0], ny = y + targ[dir][1];
-    if(openNext && nx >= 1 && nx <= n && ny >= 1 && ny <= m) open[nx][ny] = 1;
+    let nx = x + targ[last][0], ny = y + targ[last][1];
     while(nx >= 1 && nx <= n && ny >= 1 && ny <= m) {
         if(open[nx][ny] == 0 || open[nx][ny] == 2) open[nx][ny] = 3;
-        nx += targ[dir][0], ny += targ[dir][1];
+        nx += targ[last][0], ny += targ[last][1];
     }
     if(!openNext) return;
 }
