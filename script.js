@@ -28,6 +28,7 @@ let adir, alast;
 let acur;
 
 function reset() {
+    document.getElementById("res").style.opacity = "0%";
     clearInterval(interval);
     playing = 0;
     orb = [];
@@ -67,9 +68,6 @@ function init() {
             const grid = document.createElement("div");
             grid.setAttribute("class", "grid");
             grid.setAttribute("id", i + "_" + j);
-            let size = Math.floor(Math.min(window.innerWidth, window.innerHeight) * 0.04) + "px";
-            grid.style.height = size;
-            grid.style.width = size;
             let b = (1 - Math.abs(n / 2 - i) / n) * (1 - Math.abs(m / 2 - j) / n) * 1;
             if(i >= 1 && i <= n && j >= 1 && j <= m) {
                 if((i + j) % 2 == 0) grid.style.backgroundColor = "rgb(" + g1 * b + ", " + g1 * b + ", " + g1 * b + ")";
@@ -164,13 +162,21 @@ function checkOpen(openNext) {
             open[pos[i][0]][pos[i][1]] = 1;
         }
     }
-    
+
     for(let i = 0; i < apos.length; i++) {
         if(apos[i][0] >= 1 && apos[i][0] <= n && apos[i][1] >= 1 && apos[i][1] <= m) {
             open[apos[i][0]][apos[i][1]] = 1;
         }
     }
-    let nx = x + targ[dir][0], ny = y + targ[dir][1];
+    if(openNext) {
+        for(let i = 1; i <= 4; i++) {
+            let nx = x + targ[i][0], ny = y + targ[i][1];
+            if(nx >= 1 && nx <= n && ny >= 1 && ny <= m) {
+                open[nx][ny] = 1;
+            }
+        }
+    }
+    let nx = x + targ[last][0], ny = y + targ[last][1];
     if(openNext && nx >= 1 && nx <= n && ny >= 1 && ny <= m) open[nx][ny] = 1;
     while(nx >= 1 && nx <= n && ny >= 1 && ny <= m) {
         if(open[nx][ny] == 0 || open[nx][ny] == 2) open[nx][ny] = 3;
@@ -336,6 +342,16 @@ function checkHit() {
             else if(w == 2) lose++;
             else draw++;
             games++;
+        }
+        else {
+            if(w == 1) score++;
+            else if(w == 2) ascore++;
+            else {
+                score++;
+                ascore++;
+            }
+            document.getElementById("leftscore").textContent = score;
+            document.getElementById("rightscore").textContent = ascore;
         }
         die();
         return false;
@@ -595,11 +611,15 @@ document.addEventListener('keydown', function(event) {
             mode = 2;
             document.getElementById("mode").textContent = "2 Player Mode";
             document.getElementById("stats").style.opacity = "0%";
+            document.getElementById("leftscore").style.opacity = "100%";
+            document.getElementById("rightscore").style.opacity = "100%";
         }
         else {
             mode = 1;
             document.getElementById("mode").textContent = "Computer Mode";
             document.getElementById("stats").style.opacity = "100%";
+            document.getElementById("leftscore").style.opacity = "0%";
+            document.getElementById("rightscore").style.opacity = "0%";
         }
     }
 });
