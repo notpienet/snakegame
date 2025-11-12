@@ -290,7 +290,7 @@ function drawSnake() {
     }
 }
 
-let win = 0, draw = 0, lose = 0, games = 0;
+let win = 0, draw = 0, lose = 0, games = 0, score = 0, ascore = 0;
 function checkHit() {
     if(pos.length > cur) pos.shift();
     if(apos.length > acur) apos.shift();
