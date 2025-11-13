@@ -29,8 +29,20 @@ body {
     left: 50%;
     top: 85%;
     transform: translate(-50%, -50%);
-    font-size: min(9vw, 9vh);
+    font-size: min(7vw, 7vh);
     text-wrap: nowrap;
+    font-weight: normal;
+}
+
+#space {
+    opacity: 0%;
+    position: absolute;
+    left: 50%;
+    bottom: 82%;
+    transform: translate(-50%, -50%);
+    font-size: min(3vw, 3vh);
+    text-wrap: nowrap;
+    font-weight: normal;
 }
 
 * > .gimg {

@@ -28,6 +28,7 @@ let adir, alast;
 let acur;
 
 function reset() {
+    document.getElementById("space").style.opacity = "0%";
     document.getElementById("res").style.opacity = "0%";
     clearInterval(interval);
     playing = 0;
@@ -103,7 +104,8 @@ function die() {
     clearInterval(interval);
     buffer = [];
     abuffer = [];
-    document.getElementById("ins").textContent = "Press the spacebar to reset";
+    document.getElementById("ins").textContent = " ";
+    document.getElementById("space").style.opacity = "100%";
     document.getElementById("change").textContent = "Press P to change modes";
     document.getElementById("stats").innerHTML = win + "W / " + draw + "D / " + lose + "L (" + (Math.round((10000 * (win + 0.5 * draw)) / games) / 100).toFixed(2) + "%)";
 }
@@ -342,6 +344,9 @@ function checkHit() {
             else if(w == 2) lose++;
             else draw++;
             games++;
+            if(w == 1) document.getElementById("res").textContent = "You won!";
+            if(w == 2) document.getElementById("res").textContent = "You lost!";
+            if(w == 3) document.getElementById("res").textContent = "You drew!";
         }
         else {
             if(w == 1) score++;
@@ -350,9 +355,13 @@ function checkHit() {
                 score++;
                 ascore++;
             }
+            if(w == 1) document.getElementById("res").textContent = "Blue snake won!";
+            if(w == 2) document.getElementById("res").textContent = "Red snake won!";
+            if(w == 3) document.getElementById("res").textContent = "Game ended in a draw!";
             document.getElementById("leftscore").textContent = score;
             document.getElementById("rightscore").textContent = ascore;
         }
+        document.getElementById("res").style.opacity = "100%";
         die();
         return false;
     }
@@ -595,7 +604,7 @@ document.addEventListener('keydown', function(event) {
         document.getElementById("ins").textContent = "";
         document.getElementById("change").textContent = "";
     }
-    if(press == " " && playing == 1) reset();
+    if(press == " " && playing == 1 && document.getElementById("ins").textContent != "") reset();
     if(cand != -1) {
         let templast = last;
         if(buffer.length > 0) templast = buffer[buffer.length - 1];
@@ -621,6 +630,7 @@ document.addEventListener('keydown', function(event) {
             document.getElementById("leftscore").style.opacity = "0%";
             document.getElementById("rightscore").style.opacity = "0%";
         }
+        if(playing == 1) reset();
     }
 });
 
